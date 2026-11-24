@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hóa Học Thầy Chiến - Hệ Thống Học Tập & Luyện Thi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    // =========================================================================
+    // KẾT NỐI SUPABASE (Thầy dán đầy đủ chuỗi Publishable key vào dòng dưới)
+    // =========================================================================
+    const SUPABASE_URL = "https://tfmexicqxbuznmvtepzq.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_gC4WzQW2X2bhuAX4QpPzcg_EBHDDGMg";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const { useState, useEffect } = React;
+
+    // Dữ liệu mẫu khởi tạo chuẩn GDPT 2018 (Danh pháp IUPAC)
+    const SAMPLE_QUESTIONS = [
+      {
+        id: "q1",
+        grade_id: "9",
+        chapter: "Kim loại & Phi kim",
+        type: "mcq",
+        content: "Kim loại nào sau đây tác dụng được với dung dịch sulfuric acid (H₂SO₄) loãng giải phóng khí hydrogen?",
+        options: ["Copper (Cu)", "Iron (Fe)", "Silver (Ag)", "Gold (Au)"],
+        correct_answer: "Iron (Fe)",
+        hints: [
+          "Bước 1: Nhớ lại dãy hoạt động hóa học của kim loại.",
+          "Bước 2: Chỉ các kim loại đứng trước Hydrogen (H) mới phản ứng được với dung dịch acid loãng."
+        ],
+        explanation: "Iron (Fe) đứng trước H trong dãy hoạt động hóa học nên phản ứng được: Fe + H₂SO₄ → FeSO₄ + H₂↑. Các kim loại Cu, Ag, Au đứng sau H nên không phản ứng.",
+        search_count: 14
+      },
+      {
+        id: "q2",
+        grade_id: "9",
+        chapter: "Hợp chất hữu cơ - Hydrocarbon",
+        type: "true_false",
+        content: "Cho các phát biểu sau về alkane và alkene. Chọn Đúng hoặc Sai cho mỗi ý:",
+        options: [
+          "a) Methane (CH₄) là thành phần chính của khí thiên nhiên và khí mỏ dầu.",
+          "b) Ethylene (C₂H₄) làm mất màu dung dịch bromine ở điều kiện thường.",
+          "c) Đốt cháy hoàn toàn alkane luôn thu được số mol CO₂ lớn hơn số mol H₂O.",
+          "d) Phản ứng đặc trưng của methane với chlorine ngoài ánh sáng là phản ứng cộng."
+        ],
+        correct_answer: ["Đúng", "Đúng", "Sai", "Sai"],
+        hints: [
+          "Bước 1: Xem lại tính chất vật lí và nguồn tự nhiên của methane.",
+          "Bước 2: So sánh liên kết đơn (phản ứng thế) ở alkane và liên kết đôi (phản ứng cộng) ở alkene."
+        ],
+        explanation: "a) Đúng. b) Đúng do C₂H₄ có liên kết đôi kém bền. c) Sai vì đốt alkane thu được n(H₂O) > n(CO₂). d) Sai vì methane tham gia phản ứng thế.",
+        search_count: 21
+      },
+      {
+        id: "q3",
+        grade_id: "10",
+        chapter: "Cấu tạo nguyên tử",
+        type: "short_answer",
+        content: "Nguyên tử Aluminium (Al) có số hiệu nguyên tử Z = 13 và số khối A = 27. Tổng số hạt proton, neutron và electron trong một nguyên tử Al là bao nhiêu?",
+        options: [],
+        correct_answer: "40",
+        hints: [
+          "Bước 1: Trong nguyên tử trung hòa điện: số p = số e = Z.",
+          "Bước 2: Số khối A = Z + N ⇒ N = A - Z."
+        ],
+        explanation: "Ta có p = e = 13; n = 27 - 13 = 14. Tổng số hạt cơ bản = 13 + 13 + 14 = 40 hạt.",
+        search_count: 9
+      },
+      {
+        id: "q4",
+        grade_id: "10",
+        chapter: "Liên kết hóa học",
+        type: "fill_blank",
+        content: "Liên kết được hình thành bởi lực hút tĩnh điện giữa các ion mang điện tích trái dấu được gọi là liên kết ______.",
+        options: [],
+        correct_answer: "ion",
+        hints: ["Gợi ý: Tên loại liên kết trùng với tên của các hạt mang điện tạo nên nó."],
+        explanation: "Liên kết ion được hình thành bởi lực hút tĩnh điện giữa cation và anion.",
+        search_count: 7
+      },
+      {
+        id: "q5",
+        grade_id: "9",
+        chapter: "Kim loại & Phi kim",
+        type: "essay",
+        content: "Hòa tan hoàn toàn 5,6 gam Iron (Fe) vào dung dịch hydrochloric acid (HCl) dư. Viết phương trình hóa học và tính thể tích khí hydrogen thoát ra ở điều kiện chuẩn (25 °C, 1 bar).",
+        options: [],
+        correct_answer: "V = 2,479 L",
+        hints: [
+          "Bước 1: Tính số mol Fe theo công thức n = m / M (M_Fe = 56).",
+          "Bước 2: Ở điều kiện chuẩn (25 °C, 1 bar), thể tích mol khí V_m = 24,79 L/mol."
+        ],
+        explanation: "n(Fe) = 5,6 / 56 = 0,1 mol. PTHH: Fe + 2HCl → FeCl₂ + H₂↑. Theo PTHH: n(H₂) = 0,1 mol ⇒ V(H₂) = 0,1 × 24,79 = 2,479 lít.",
+        search_count: 18
+      }
+    ];
+
+    function App() {
+      const [user, setUser] = useState(null);
+      const [authModal, setAuthModal] = useState(false);
+      const [isRegister, setIsRegister] = useState(false);
+      const [email, setEmail] = useState("");
+      const [password, setPassword] = useState("");
+      const [fullName, setFullName] = useState("");
+      const [className, setClassName] = useState("9D");
+      const [classCode, setClassCode] = useState("");
+
+      const [grades, setGrades] = useState([
+        { id: "9", name: "Khối 9", description: "KHTN 9 - Phân môn Hóa học (KNTT)" },
+        { id: "10", name: "Khối 10", description: "Hóa học 10 (KNTT)" }
+      ]);
+      const [selectedGrade, setSelectedGrade] = useState("9");
+      const [mode, setMode] = useState("lookup"); // 'lookup' | 'practice' | 'exam' | 'admin'
+      const [questions, setQuestions] = useState(SAMPLE_QUESTIONS);
+
+      // State Tra cứu
+      const [searchQuery, setSearchQuery] = useState("");
+      const [revealedHints, setRevealedHints] = useState({});
+      const [revealedSol, setRevealedSol] = useState({});
+
+      // State Luyện tập & Kiểm tra
+      const [answers, setAnswers] = useState({});
+      const [checkedPractice, setCheckedPractice] = useState({});
+      const [examSubmitted, setExamSubmitted] = useState(false);
+      const [timeLeft, setTimeLeft] = useState(900); // 15 phút
+
+      // State Admin thêm câu hỏi
+      const [newQ, setNewQ] = useState({
+        grade_id: "9",
+        chapter: "Kim loại & Phi kim",
+        type: "mcq",
+        content: "",
+        optA: "", optB: "", optC: "", optD: "",
+        correct_answer: "",
+        hint1: "",
+        explanation: ""
+      });
+
+      useEffect(() => {
+        loadFromSupabase();
+      }, []);
+
+      useEffect(() => {
+        if (mode !== "exam" || examSubmitted) return;
+        const timer = setInterval(() => {
+          setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
+        }, 1000);
+        return () => clearInterval(timer);
+      }, [mode, examSubmitted]);
+
+      async function loadFromSupabase() {
+        try {
+          const { data: gData } = await supabase.from("grades").select("*").eq("is_active", true);
+          if (gData && gData.length > 0) setGrades(gData);
+
+          const { data: qData } = await supabase.from("questions").select("*");
+          if (qData && qData.length > 0) setQuestions(qData);
+        } catch (err) {
+          console.log("Đang dùng dữ liệu mẫu cục bộ:", err.message);
+        }
+      }
+
+      async function handleAuth(e) {
+        e.preventDefault();
+        if (isRegister) {
+          if (classCode.trim().toUpperCase() !== "THAYCHIEN") {
+            alert("Mã lớp chưa chính xác! Vui lòng nhập mã do Thầy Chiến cung cấp (mã thử nghiệm: THAYCHIEN).");
+            return;
+          }
+          const { data, error } = await supabase.auth.signUp({ email, password });
+          if (error) return alert("Lỗi đăng ký: " + error.message);
+          if (data.user) {
+            await supabase.from("profiles").insert({
+              id: data.user.id,
+              full_name: fullName,
+              role: "student",
+              grade_id: selectedGrade,
+              class_name: className
+            });
+            setUser({ email, full_name: fullName, role: "student", class_name: className });
+            setAuthModal(false);
+          }
+        } else {
+          const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+          if (error) return alert("Lỗi đăng nhập: " + error.message);
+          setUser({ email: data.user.email, full_name: data.user.email.split("@")[0], role: "student" });
+          setAuthModal(false);
+        }
+      }
+
+      async function handleAddQuestion(e) {
+        e.preventDefault();
+        const opts = newQ.type === "mcq" || newQ.type === "true_false"
+          ? [newQ.optA, newQ.optB, newQ.optC, newQ.optD].filter(Boolean)
+          : [];
+        const corr = newQ.type === "true_false"
+          ? newQ.correct_answer.split(",").map(s => s.trim())
+          : newQ.correct_answer;
+
+        const payload = {
+          grade_id: newQ.grade_id,
+          chapter: newQ.chapter,
+          type: newQ.type,
+          content: newQ.content,
+          options: opts,
+          correct_answer: corr,
+          hints: newQ.hint1 ? [newQ.hint1] : [],
+          explanation: newQ.explanation
+        };
+
+        const { data, error } = await supabase.from("questions").insert(payload).select();
+        if (error) {
+          setQuestions([{ ...payload, id: Date.now().toString(), search_count: 0 }, ...questions]);
+          alert("Đã lưu câu hỏi trên giao diện (kiểm tra lại Supabase Key nếu chưa đồng bộ đám mây).");
+        } else if (data) {
+          setQuestions([data[0], ...questions]);
+          alert("Đã thêm câu hỏi thành công lên cơ sở dữ liệu Supabase!");
+        }
+        setNewQ({ ...newQ, content: "", optA: "", optB: "", optC: "", optD: "", correct_answer: "", hint1: "", explanation: "" });
+      }
+
+      const gradeQuestions = questions.filter((q) => q.grade_id === selectedGrade);
+      const filteredLookup = gradeQuestions.filter((q) =>
+        q.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        q.chapter.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+      const calculateScore = () => {
+        let total = 0;
+        gradeQuestions.forEach((q) => {
+          const ans = answers[q.id];
+          if (!ans) return;
+          if (q.type === "true_false" && Array.isArray(q.correct_answer)) {
+            let match = 0;
+            q.correct_answer.forEach((val, idx) => {
+              if (ans[idx] === val) match++;
+            });
+            const mapScore = [0, 0.1, 0.25, 0.5, 1.0];
+            total += mapScore[match] || 0;
+          } else if (q.type !== "essay") {
+            if (String(ans).trim().toLowerCase() === String(q.correct_answer).trim().toLowerCase()) {
+              total += 1;
+            }
+          }
+        });
+        return total.toFixed(2);
+      };
+
+      const formatTime = (sec) => {
+        const m = Math.floor(sec / 60);
+        const s = sec % 60;
+        return `${m}:${s < 10 ? "0" : ""}${s}`;
+      };
+
+      return (
+        <div className="min-h-screen flex flex-col">
+          {/* Header */}
+          <header className="bg-teal-700 text-white shadow-md">
+            <div className="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="bg-white text-teal-700 font-bold px-3 py-1.5 rounded-lg text-lg">H₂O</div>
+                <div>
+                  <h1 className="font-bold text-lg leading-tight">HÓA HỌC THẦY CHIẾN</h1>
+                  <p className="text-xs text-teal-100">Hệ thống Tra cứu • Luyện tập • Kiểm tra trực tuyến</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 flex-wrap">
+                {grades.map((g) => (
+                  <button
+                    key={g.id}
+                    onClick={() => { setSelectedGrade(g.id); setExamSubmitted(false); }}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+                      selectedGrade === g.id ? "bg-amber-400 text-slate-900 font-bold" : "bg-teal-600 hover:bg-teal-500"
+                    }`}
+                  >
+                    {g.name}
+                  </button>
+                ))}
+
+                {user ? (
+                  <div className="flex items-center gap-2 ml-2 bg-teal-800 px-3 py-1.5 rounded-lg text-sm">
+                    <span>👤 {user.full_name}</span>
+                    <button onClick={() => setUser(null)} className="text-xs underline text-teal-200 ml-1">Thoát</button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setAuthModal(true)}
+                    className="ml-2 bg-white text-teal-800 font-semibold px-3 py-1.5 rounded-lg text-sm hover:bg-teal-50"
+                  >
+                    Đăng nhập / Mã lớp
+                  </button>
+                )}
+              </div>
+            </div>
+          </header>
+
+          {/* Thanh chọn 4 chế độ */}
+          <nav className="bg-white border-b border-slate-200 sticky top-0 z-10">
+            <div className="max-w-6xl mx-auto px-4 flex overflow-x-auto gap-2 py-2.5">
+              {[
+                { id: "lookup", label: "🔍 1. Tra cứu nhanh (Bí bài)" },
+                { id: "practice", label: "🎯 2. Luyện tập chuyên đề" },
+                { id: "exam", label: "⏱️ 3. Kiểm tra / Thi thử" },
+                { id: "admin", label: "⚙️ Quản trị Giáo viên" }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setMode(tab.id)}
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition ${
+                    mode === tab.id
+                      ? "bg-teal-600 text-white shadow-sm"
+                      : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </nav>
+
+          {/* Nội dung chính */}
+          <main className="max-w-5xl w-full mx-auto px-4 py-6 flex-1">
+            {/* CHẾ ĐỘ 1: TRA CỨU NHANH */}
+            {mode === "lookup" && (
+              <div className="space-y-4">
+                <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                  <h2 className="font-bold text-lg text-slate-800 mb-2">Tra cứu hướng dẫn giải nhanh ({grades.find(g => g.id === selectedGrade)?.name})</h2>
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Nhập từ khóa câu hỏi bị bí (ví dụ: sulfuric, Iron, alkane, Aluminium...)"
+                    className="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  />
+                </div>
+
+                {filteredLookup.map((q, idx) => (
+                  <div key={q.id} className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-3">
+                    <div className="flex justify-between items-center text-xs text-slate-500">
+                      <span className="bg-teal-50 text-teal-700 font-semibold px-2.5 py-1 rounded">{q.chapter}</span>
+                      <span>👁️ {q.search_count || 0} lượt tra cứu</span>
+                    </div>
+                    <p className="font-medium text-slate-900">Câu {idx + 1}: {q.content}</p>
+                    {q.options && q.options.length > 0 && (
+                      <ul className="grid sm:grid-cols-2 gap-2 text-sm text-slate-700 pl-2">
+                        {q.options.map((o, i) => <li key={i}>• {o}</li>)}
+                      </ul>
+                    )}
+
+                    <div className="flex gap-2 pt-2">
+                      <button
+                        onClick={() => setRevealedHints({ ...revealedHints, [q.id]: !revealedHints[q.id] })}
+                        className="px-3 py-1.5 text-sm bg-amber-100 text-amber-800 font-medium rounded-lg hover:bg-amber-200"
+                      >
+                        💡 {revealedHints[q.id] ? "Ẩn gợi ý tư duy" : "Xem gợi ý từng bước"}
+                      </button>
+                      <button
+                        onClick={() => setRevealedSol({ ...revealedSol, [q.id]: !revealedSol[q.id] })}
+                        className="px-3 py-1.5 text-sm bg-teal-100 text-teal-800 font-medium rounded-lg hover:bg-teal-200"
+                      >
+                        📖 {revealedSol[q.id] ? "Ẩn lời giải" : "Xem đáp án & lời giải chi tiết"}
+                      </button>
+                    </div>
+
+                    {revealedHints[q.id] && (
+                      <div className="bg-amber-50 border-l-4 border-amber-400 p-3 text-sm text-amber-900 space-y-1">
+                        {(q.hints || []).map((h, i) => <p key={i}>{h}</p>)}
+                      </div>
+                    )}
+
+                    {revealedSol[q.id] && (
+                      <div className="bg-teal-50 border-l-4 border-teal-500 p-3 text-sm text-teal-900 space-y-1">
+                        <p className="font-bold">Đáp án chuẩn: {Array.isArray(q.correct_answer) ? q.correct_answer.join(" - ") : q.correct_answer}</p>
+                        <p>{q.explanation}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* CHẾ ĐỘ 2 & 3: LUYỆN TẬP & KIỂM TRA */}
+            {(mode === "practice" || mode === "exam") && (
+              <div className="space-y-5">
+                <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap justify-between items-center gap-3">
+                  <div>
+                    <h2 className="font-bold text-lg text-slate-800">
+                      {mode === "practice" ? "Chế độ Luyện tập (Kiểm tra đáp án từng câu)" : "Bài kiểm tra tổng hợp (Đủ 5 dạng bài tập)"}
+                    </h2>
+                    <p className="text-sm text-slate-500">Hỗ trợ trắc nghiệm 4 lựa chọn, Đúng/Sai 4 ý, Điền khuyết, Trả lời ngắn và Tự luận.</p>
+                  </div>
+                  {mode === "exam" && (
+                    <div className="flex items-center gap-3">
+                      <span className="bg-rose-100 text-rose-700 font-bold px-3 py-1.5 rounded-lg">⏳ {formatTime(timeLeft)}</span>
+                      {!examSubmitted && (
+                        <button
+                          onClick={() => setExamSubmitted(true)}
+                          className="bg-teal-600 text-white font-bold px-4 py-2 rounded-lg hover:bg-teal-700"
+                        >
+                          Nộp bài
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {mode === "exam" && examSubmitted && (
+                  <div className="bg-emerald-50 border border-emerald-300 p-5 rounded-xl flex justify-between items-center">
+                    <div>
+                      <h3 className="font-bold text-emerald-900 text-lg">🎉 Đã nộp bài thành công!</h3>
+                      <p className="text-sm text-emerald-800">Điểm phần tự động chấm (Trắc nghiệm & Trả lời ngắn): <strong className="text-xl">{calculateScore()}</strong> điểm. Phần tự luận đã gửi về hệ thống của Thầy Chiến.</p>
+                    </div>
+                    <button
+                      onClick={() => { setExamSubmitted(false); setAnswers({}); setTimeLeft(900); }}
+                      className="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-semibold"
+                    >
+                      Làm lại đề
+                    </button>
+                  </div>
+                )}
+
+                {gradeQuestions.map((q, idx) => (
+                  <div key={q.id} className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-3">
+                    <div className="flex justify-between text-xs text-slate-500">
+                      <span className="font-semibold text-teal-700">{q.chapter}</span>
+                      <span className="uppercase bg-slate-100 px-2 py-0.5 rounded">{q.type}</span>
+                    </div>
+                    <p className="font-medium text-slate-900">Câu {idx + 1}: {q.content}</p>
+
+                    {/* Dạng 1: Nhiều lựa chọn */}
+                    {q.type === "mcq" && (
+                      <div className="grid sm:grid-cols-2 gap-2">
+                        {q.options.map((opt, i) => (
+                          <label key={i} className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer ${answers[q.id] === opt ? "border-teal-600 bg-teal-50" : "border-slate-200"}`}>
+                            <input
+                              type="radio"
+                              name={q.id}
+                              checked={answers[q.id] === opt}
+                              onChange={() => setAnswers({ ...answers, [q.id]: opt })}
+                            />
+                            <span className="text-sm">{opt}</span>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Dạng 2: Đúng / Sai 4 ý */}
+                    {q.type === "true_false" && (
+                      <div className="space-y-2">
+                        {q.options.map((sub, i) => {
+                          const curArr = answers[q.id] || ["", "", "", ""];
+                          return (
+                            <div key={i} className="flex flex-wrap items-center justify-between gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                              <span className="text-sm flex-1">{sub}</span>
+                              <div className="flex gap-2">
+                                {["Đúng", "Sai"].map((choice) => (
+                                  <button
+                                    key={choice}
+                                    type="button"
+                                    onClick={() => {
+                                      const next = [...curArr];
+                                      next[i] = choice;
+                                      setAnswers({ ...answers, [q.id]: next });
+                                    }}
+                                    className={`px-3 py-1 rounded text-xs font-bold ${
+                                      curArr[i] === choice ? "bg-teal-600 text-white" : "bg-white border border-slate-300 text-slate-600"
+                                    }`}
+                                  >
+                                    {choice}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* Dạng 3 & 4: Điền khuyết & Trả lời ngắn */}
+                    {(q.type === "fill_blank" || q.type === "short_answer") && (
+                      <input
+                        type="text"
+                        value={answers[q.id] || ""}
+                        onChange={(e) => setAnswers({ ...answers, [q.id]: e.target.value })}
+                        placeholder="Nhập câu trả lời ngắn của em..."
+                        className="w-full sm:w-80 border border-slate-300 rounded-lg px-3 py-2 text-sm"
+                      />
+                    )}
+
+                    {/* Dạng 5: Tự luận */}
+                    {q.type === "essay" && (
+                      <textarea
+                        rows="3"
+                        value={answers[q.id] || ""}
+                        onChange={(e) => setAnswers({ ...answers, [q.id]: e.target.value })}
+                        placeholder="Trình bày lời giải chi tiết hoặc dán link ảnh bài làm..."
+                        className="w-full border border-slate-300 rounded-lg p-3 text-sm"
+                      />
+                    )}
+
+                    {mode === "practice" && (
+                      <div className="pt-2">
+                        <button
+                          onClick={() => setCheckedPractice({ ...checkedPractice, [q.id]: true })}
+                          className="bg-teal-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-teal-700"
+                        >
+                          Kiểm tra câu này
+                        </button>
+                      </div>
+                    )}
+
+                    {((mode === "practice" && checkedPractice[q.id]) || (mode === "exam" && examSubmitted)) && (
+                      <div className="bg-slate-100 p-3 rounded-lg text-sm space-y-1 border-l-4 border-teal-600">
+                        <p className="font-bold text-teal-800">Đáp án chuẩn: {Array.isArray(q.correct_answer) ? q.correct_answer.join(" | ") : q.correct_answer}</p>
+                        <p className="text-slate-700">{q.explanation}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* CHẾ ĐỘ 4: QUẢN TRỊ GIÁO VIÊN */}
+            {mode === "admin" && (
+              <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
+                <h2 className="font-bold text-lg text-teal-800">Thêm câu hỏi mới vào Ngân hàng đề (Đồng bộ Supabase)</h2>
+                <form onSubmit={handleAddQuestion} className="space-y-3">
+                  <div className="grid sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold mb-1">Khối lớp</label>
+                      <select
+                        value={newQ.grade_id}
+                        onChange={(e) => setNewQ({ ...newQ, grade_id: e.target.value })}
+                        className="w-full border rounded-lg p-2 text-sm"
+                      >
+                        {grades.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold mb-1">Chương / Chủ đề</label>
+                      <input
+                        required
+                        value={newQ.chapter}
+                        onChange={(e) => setNewQ({ ...newQ, chapter: e.target.value })}
+                        className="w-full border rounded-lg p-2 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold mb-1">Dạng câu hỏi</label>
+                      <select
+                        value={newQ.type}
+                        onChange={(e) => setNewQ({ ...newQ, type: e.target.value })}
+                        className="w-full border rounded-lg p-2 text-sm"
+                      >
+                        <option value="mcq">Trắc nghiệm nhiều lựa chọn</option>
+                        <option value="true_false">Trắc nghiệm Đúng/Sai (4 ý)</option>
+                        <option value="fill_blank">Điền khuyết</option>
+                        <option value="short_answer">Trả lời ngắn</option>
+                        <option value="essay">Tự luận</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold mb-1">Nội dung câu hỏi</label>
+                    <textarea
+                      required
+                      rows="2"
+                      value={newQ.content}
+                      onChange={(e) => setNewQ({ ...newQ, content: e.target.value })}
+                      className="w-full border rounded-lg p-2 text-sm"
+                      placeholder="Nhập đề bài..."
+                    />
+                  </div>
+
+                  {(newQ.type === "mcq" || newQ.type === "true_false") && (
+                    <div className="grid sm:grid-cols-2 gap-2">
+                      <input placeholder="Lựa chọn A / Ý a)" value={newQ.optA} onChange={(e) => setNewQ({ ...newQ, optA: e.target.value })} className="border rounded-lg p-2 text-sm" />
+                      <input placeholder="Lựa chọn B / Ý b)" value={newQ.optB} onChange={(e) => setNewQ({ ...newQ, optB: e.target.value })} className="border rounded-lg p-2 text-sm" />
+                      <input placeholder="Lựa chọn C / Ý c)" value={newQ.optC} onChange={(e) => setNewQ({ ...newQ, optC: e.target.value })} className="border rounded-lg p-2 text-sm" />
+                      <input placeholder="Lựa chọn D / Ý d)" value={newQ.optD} onChange={(e) => setNewQ({ ...newQ, optD: e.target.value })} className="border rounded-lg p-2 text-sm" />
+                    </div>
+                  )}
+
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold mb-1">Đáp án chuẩn (Với Đúng/Sai nhập: Đúng, Sai, Đúng, Sai)</label>
+                      <input
+                        required
+                        value={newQ.correct_answer}
+                        onChange={(e) => setNewQ({ ...newQ, correct_answer: e.target.value })}
+                        className="w-full border rounded-lg p-2 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold mb-1">Gợi ý tư duy (cho chế độ Tra cứu)</label>
+                      <input
+                        value={newQ.hint1}
+                        onChange={(e) => setNewQ({ ...newQ, hint1: e.target.value })}
+                        className="w-full border rounded-lg p-2 text-sm"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold mb-1">Lời giải chi tiết</label>
+                    <textarea
+                      rows="2"
+                      value={newQ.explanation}
+                      onChange={(e) => setNewQ({ ...newQ, explanation: e.target.value })}
+                      className="w-full border rounded-lg p-2 text-sm"
+                    />
+                  </div>
+
+                  <button type="submit" className="bg-teal-700 text-white font-bold px-5 py-2.5 rounded-lg hover:bg-teal-800">
+                    + Lưu câu hỏi lên hệ thống
+                  </button>
+                </form>
+              </div>
+            )}
+          </main>
+
+          {/* Modal Đăng nhập / Đăng ký */}
+          {authModal && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+              <div className="bg-white rounded-xl max-w-md w-full p-6 space-y-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="font-bold text-lg">{isRegister ? "Đăng ký tài khoản Học sinh" : "Đăng nhập hệ thống"}</h3>
+                  <button onClick={() => setAuthModal(false)} className="text-slate-400 hover:text-slate-600">✕</button>
+                </div>
+                <form onSubmit={handleAuth} className="space-y-3">
+                  {isRegister && (
+                    <>
+                      <input required placeholder="Họ và tên học sinh" value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full border rounded-lg p-2.5 text-sm" />
+                      <div className="grid grid-cols-2 gap-2">
+                        <input required placeholder="Lớp (VD: 9D, 10A1)" value={className} onChange={(e) => setClassName(e.target.value)} className="border rounded-lg p-2.5 text-sm" />
+                        <input required placeholder="Mã lớp (THAYCHIEN)" value={classCode} onChange={(e) => setClassCode(e.target.value)} className="border rounded-lg p-2.5 text-sm" />
+                      </div>
+                    </>
+                  )}
+                  <input required type="email" placeholder="Email đăng nhập" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full border rounded-lg p-2.5 text-sm" />
+                  <input required type="password" placeholder="Mật khẩu (tối thiểu 6 ký tự)" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full border rounded-lg p-2.5 text-sm" />
+                  <button type="submit" className="w-full bg-teal-600 text-white font-bold py-2.5 rounded-lg hover:bg-teal-700">
+                    {isRegister ? "Tạo tài khoản" : "Đăng nhập"}
+                  </button>
+                </form>
+                <p className="text-xs text-center text-slate-600">
+                  {isRegister ? "Đã có tài khoản? " : "Chưa có tài khoản? "}
+                  <button onClick={() => setIsRegister(!isRegister)} className="text-teal-700 font-bold underline">
+                    {isRegister ? "Đăng nhập ngay" : "Đăng ký bằng Mã lớp"}
+                  </button>
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<App />);
+  </script>
+</body>
+</html>
