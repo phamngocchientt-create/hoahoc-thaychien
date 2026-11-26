@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hóa Học Thầy Chiến (v4.0) - Tra cứu Mã câu hỏi & Luyện thi</title>
+  <title>Hóa Học Thầy Chiến (v4.1) - Tra cứu Mã câu hỏi & Luyện thi</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
@@ -14,9 +14,6 @@
   <div id="root"></div>
 
   <script type="text/babel">
-    // =========================================================================
-    // KẾT NỐI SUPABASE DỰ ÁN "HOÁ HỌC - THẦY CHIẾN"
-    // =========================================================================
     const SUPABASE_URL = "https://tfmexicqxbuznmvtepzq.supabase.co";
     const SUPABASE_KEY = "sb_publishable_gC4WzQW2X2bhuAX4QpPzcg_EBHDDGMg";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -36,7 +33,7 @@
         .toLowerCase()
         .replace(/[₀-₉]/g, (m) => subMap[m] || m)
         .normalize("NFD")
-        .replace(/[̀-ͯ]/g, "")
+        .replace(/[\u0300-\u036f]/g, "")
         .replace(/đ/g, "d")
         .replace(/[^a-z0-9\s.,-]/g, " ")
         .replace(/\s+/g, " ")
@@ -48,7 +45,6 @@
       return String(code).toLowerCase().replace(/[^a-z0-9-]/g, "").trim();
     }
 
-    // Tự động tách mã nếu thầy dán nguyên dòng kiểu "[9KL-06] Nội dung câu hỏi..."
     function extractLeadingCode(rawContent) {
       const match = rawContent.trim().match(/^\[([A-Za-z0-9-_]+)\]\s*(.*)$/s);
       if (match) {
@@ -160,21 +156,18 @@
       const [mode, setMode] = useState("lookup");
       const [questions, setQuestions] = useState(SAMPLE_QUESTIONS);
 
-      // State Tra cứu
       const [searchQuery, setSearchQuery] = useState("");
       const [chapterFilter, setChapterFilter] = useState("ALL");
       const [searchAllGrades, setSearchAllGrades] = useState(true);
       const [revealedHints, setRevealedHints] = useState({});
       const [revealedSol, setRevealedSol] = useState({});
 
-      // State Luyện tập & Kiểm tra
       const [answers, setAnswers] = useState({});
       const [checkedPractice, setCheckedPractice] = useState({});
       const [examSubmitted, setExamSubmitted] = useState(false);
       const [timeLeft, setTimeLeft] = useState(900);
 
-      // State Admin
-      const [adminSubTab, setAdminSubTab] = useState("single"); // 'single' | 'bulk' | 'grades'
+      const [adminSubTab, setAdminSubTab] = useState("single");
       const [newGradeName, setNewGradeName] = useState("");
       const [newGradeId, setNewGradeId] = useState("");
       const [bulkText, setBulkText] = useState("");
@@ -316,7 +309,6 @@
         alert("Đã mở thêm khối lớp mới!");
       }
 
-      // Khi thầy dán đề có dạng "[9KL-06] Nội dung..." vào ô đề bài -> tự điền Mã câu hỏi
       function handleContentChange(val) {
         const { extractedCode, cleanContent } = extractLeadingCode(val);
         if (extractedCode && !newQ.question_code) {
@@ -360,8 +352,7 @@
 
         const { data, error } = await supabase.from("questions").insert(payload).select();
         if (error) {
-          alert("Lỗi lưu lên Supabase: " + error.message + "
-(Thầy kiểm tra xem đã chạy lệnh ALTER TABLE questions ADD COLUMN question_code TEXT trên Supabase chưa nhé!)");
+          alert("Lỗi lưu lên Supabase: " + error.message);
         } else if (data) {
           setQuestions([data[0], ...questions]);
           alert(`Đã lưu thành công câu hỏi có Mã: [${cleanCode}]!`);
@@ -378,12 +369,10 @@
         }
       }
 
-      // Nhập nhanh nhiều câu hỏi cùng lúc theo định dạng: MÃ | ĐỀ BÀI | ĐÁP ÁN | GỢI Ý | LỜI GIẢI
       async function handleBulkImport(e) {
         e.preventDefault();
         if (!isAdmin) return;
-        const lines = bulkText.split("
-").map((l) => l.trim()).filter(Boolean);
+        const lines = bulkText.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
         if (lines.length === 0) return;
 
         const rowsToInsert = [];
@@ -517,7 +506,6 @@
 
       return (
         <div className="min-h-screen flex flex-col">
-          {/* Header */}
           <header className="bg-teal-800 text-white shadow-md">
             <div className="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-3">
@@ -525,7 +513,7 @@
                 <div>
                   <div className="flex items-center gap-2">
                     <h1 className="font-bold text-lg leading-tight">HÓA HỌC THẦY CHIẾN</h1>
-                    <span className="text-[11px] bg-teal-950 text-amber-300 font-mono px-2 py-0.5 rounded">v4.0</span>
+                    <span className="text-[11px] bg-teal-950 text-amber-300 font-mono px-2 py-0.5 rounded">v4.1</span>
                   </div>
                   <p className="text-xs text-teal-200">Tra cứu theo Mã câu hỏi & Từ khóa • Luyện tập • Kiểm tra</p>
                 </div>
@@ -565,7 +553,6 @@
             </div>
           </header>
 
-          {/* Thanh điều hướng chế độ */}
           <nav className="bg-white border-b border-slate-200 sticky top-0 z-10">
             <div className="max-w-6xl mx-auto px-4 flex overflow-x-auto gap-2 py-2.5">
               {[
@@ -591,9 +578,7 @@
             </div>
           </nav>
 
-          {/* Nội dung chính */}
           <main className="max-w-5xl w-full mx-auto px-4 py-6 flex-1">
-            {/* CHẾ ĐỘ 1: TRA CỨU */}
             {mode === "lookup" && (
               <div className="space-y-4">
                 <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-3">
@@ -746,7 +731,6 @@
               </div>
             )}
 
-            {/* CHẾ ĐỘ 2 & 3: LUYỆN TẬP & KIỂM TRA */}
             {(mode === "practice" || mode === "exam") && (
               <div className="space-y-5">
                 <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap justify-between items-center gap-3">
@@ -888,10 +872,8 @@
               </div>
             )}
 
-            {/* CHẾ ĐỘ 4: QUẢN TRỊ ĐỘC QUYỀN CỦA GIÁO VIÊN */}
             {mode === "admin" && isAdmin && (
               <div className="space-y-6">
-                {/* Thanh chuyển chế độ nhập liệu trong Admin */}
                 <div className="flex flex-wrap gap-2 bg-amber-50 p-3 rounded-xl border border-amber-200">
                   <button
                     onClick={() => setAdminSubTab("single")}
@@ -913,7 +895,6 @@
                   </button>
                 </div>
 
-                {/* TAB CON 1: NHẬP TỪNG CÂU HỎI */}
                 {adminSubTab === "single" && (
                   <div className="bg-white p-6 rounded-xl shadow-sm border-2 border-teal-600/30 space-y-4">
                     <div className="border-b pb-3">
@@ -922,7 +903,6 @@
                     </div>
 
                     <form onSubmit={handleAddQuestion} className="space-y-4">
-                      {/* Dòng 1: Ô Mã câu hỏi nổi bật */}
                       <div className="bg-teal-50/70 p-4 rounded-xl border border-teal-200 grid sm:grid-cols-4 gap-3">
                         <div>
                           <label className="block text-xs font-extrabold text-teal-900 uppercase mb-1">
@@ -1041,7 +1021,6 @@
                   </div>
                 )}
 
-                {/* TAB CON 2: NHẬP HÀNG LOẠT NHIỀU CÂU CÓ SẴN MÃ */}
                 {adminSubTab === "bulk" && (
                   <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
                     <div>
@@ -1081,146 +1060,4 @@
                         rows="6"
                         value={bulkText}
                         onChange={(e) => setBulkText(e.target.value)}
-                        placeholder={"Ví dụ:
-9KL-10 | Hòa tan 2,4g Mg vào HCl dư thu được bao nhiêu lít H2 (đkc)? | 2,479 L | Tính n(Mg) = 2,4/24 = 0,1 mol | Mg + 2HCl -> MgCl2 + H2 => V = 0,1 x 24,79 = 2,479 L
-9KL-11 | Kim loại nào dẫn điện tốt nhất? | Silver (Ag) | Nhớ lại thứ tự dẫn điện: Ag > Cu > Au > Al | Silver (Ag) là kim loại dẫn điện tốt nhất."}
-                        className="w-full border rounded-lg p-3 text-sm font-mono"
-                      />
-
-                      <button type="submit" className="bg-teal-700 text-white font-bold px-5 py-2.5 rounded-lg hover:bg-teal-800">
-                        ⚡ Nạp toàn bộ danh sách câu hỏi lên hệ thống
-                      </button>
-                    </form>
-                  </div>
-                )}
-
-                {/* TAB CON 3: MỞ RỘNG KHỐI LỚP */}
-                {adminSubTab === "grades" && (
-                  <div className="bg-white p-5 rounded-xl shadow-sm border border-amber-200">
-                    <h2 className="font-bold text-base text-amber-900 mb-3">Quản lý & Mở rộng Khối lớp</h2>
-                    <form onSubmit={handleAddGrade} className="flex flex-wrap gap-3">
-                      <input
-                        required
-                        placeholder="Mã khối (VD: 8, 11, ONTHI)"
-                        value={newGradeId}
-                        onChange={(e) => setNewGradeId(e.target.value)}
-                        className="border rounded-lg px-3 py-2 text-sm"
-                      />
-                      <input
-                        required
-                        placeholder="Tên hiển thị (VD: Khối 8, Ôn thi vào 10)"
-                        value={newGradeName}
-                        onChange={(e) => setNewGradeName(e.target.value)}
-                        className="border rounded-lg px-3 py-2 text-sm flex-1"
-                      />
-                      <button type="submit" className="bg-amber-600 text-white font-semibold px-4 py-2 rounded-lg text-sm hover:bg-amber-700">
-                        + Thêm khối lớp
-                      </button>
-                    </form>
-                  </div>
-                )}
-
-                {/* Danh sách quản lý & xóa câu hỏi */}
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-3">
-                  <h2 className="font-bold text-lg text-slate-800">Danh sách câu hỏi & Mã đã lưu ({questions.length} câu)</h2>
-                  {questions.map((q) => (
-                    <div key={q.id} className="flex justify-between items-start gap-3 p-3 border rounded-lg text-sm">
-                      <div>
-                        <span className="font-mono font-bold bg-teal-700 text-white px-2 py-0.5 rounded mr-2">
-                          {q.question_code || "CHƯA CÓ MÃ"}
-                        </span>
-                        <span className="text-xs font-bold text-slate-500">[Khối {q.grade_id} - {q.chapter}] </span>
-                        <span>{q.content}</span>
-                      </div>
-                      <button
-                        onClick={() => handleDeleteQuestion(q.id)}
-                        className="text-xs text-rose-600 hover:underline font-semibold shrink-0"
-                      >
-                        Xóa
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </main>
-
-          {/* Modal Đăng nhập / Đăng ký phân quyền */}
-          {authModal && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-              <div className="bg-white rounded-xl max-w-md w-full p-6 space-y-4">
-                <div className="flex justify-between items-center border-b pb-3">
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setAuthTab("login")}
-                      className={`text-xs font-bold px-2.5 py-1.5 rounded ${authTab === "login" ? "bg-teal-700 text-white" : "bg-slate-100"}`}
-                    >
-                      Đăng nhập
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setAuthTab("register_student")}
-                      className={`text-xs font-bold px-2.5 py-1.5 rounded ${authTab === "register_student" ? "bg-teal-700 text-white" : "bg-slate-100"}`}
-                    >
-                      ĐK Học sinh
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setAuthTab("register_admin")}
-                      className={`text-xs font-bold px-2.5 py-1.5 rounded ${authTab === "register_admin" ? "bg-amber-600 text-white" : "bg-slate-100"}`}
-                    >
-                      ĐK Giáo viên
-                    </button>
-                  </div>
-                  <button onClick={() => setAuthModal(false)} className="text-slate-400 hover:text-slate-600">✕</button>
-                </div>
-
-                <form onSubmit={handleAuth} className="space-y-3">
-                  {authTab !== "login" && (
-                    <>
-                      <input
-                        required
-                        placeholder={authTab === "register_admin" ? "Họ tên Giáo viên (VD: Thầy Chiến)" : "Họ và tên học sinh"}
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                        className="w-full border rounded-lg p-2.5 text-sm"
-                      />
-                      {authTab === "register_student" ? (
-                        <div className="grid grid-cols-2 gap-2">
-                          <input required placeholder="Lớp (VD: 9D, 10A1)" value={className} onChange={(e) => setClassName(e.target.value)} className="border rounded-lg p-2.5 text-sm" />
-                          <input required placeholder="Mã lớp (THAYCHIEN)" value={secretCode} onChange={(e) => setSecretCode(e.target.value)} className="border rounded-lg p-2.5 text-sm" />
-                        </div>
-                      ) : (
-                        <input
-                          required
-                          type="password"
-                          placeholder="Mã bí mật Giáo viên (ADMIN_THAYCHIEN)"
-                          value={secretCode}
-                          onChange={(e) => setSecretCode(e.target.value)}
-                          className="w-full border border-amber-400 rounded-lg p-2.5 text-sm"
-                        />
-                      )}
-                    </>
-                  )}
-                  <input required type="email" placeholder="Email đăng nhập" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full border rounded-lg p-2.5 text-sm" />
-                  <input required type="password" placeholder="Mật khẩu (tối thiểu 6 ký tự)" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full border rounded-lg p-2.5 text-sm" />
-                  <button
-                    type="submit"
-                    className={`w-full text-white font-bold py-2.5 rounded-lg ${authTab === "register_admin" ? "bg-amber-600 hover:bg-amber-700" : "bg-teal-700 hover:bg-teal-800"}`}
-                  >
-                    {authTab === "login" ? "Đăng nhập hệ thống" : authTab === "register_admin" ? "Tạo tài khoản Quản trị" : "Tạo tài khoản Học sinh"}
-                  </button>
-                </form>
-              </div>
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    const root = ReactDOM.createRoot(document.getElementById("root"));
-    root.render(<App />);
-  </script>
-</body>
-</html>
+                        placeholder={"Ví dụ:\n9KL-10 | Hòa tan 2,4g Mg vào HCl dư thu được bao nhiêu lít H2 (đkc)? | 2,479 L | Tính n(Mg) = 2,4/24 = 0,1 mol | Mg + 2HCl -> MgCl2 + H2 => V = 0,1 x 24,79 = 2,479 L\n9KL-11 | Kim loại nào dẫn điện tốt nhất? | Silver (Ag) | Nhớ lại thứ tự dẫn điện: Ag >
