@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hóa Học Thầy Chiến - Hệ Thống Học Tập & Luyện Thi Thông Minh</title>
+  <title>Hóa Học Thầy Chiến (v4.0) - Tra cứu Mã câu hỏi & Luyện thi</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
@@ -26,9 +26,6 @@
 
     const { useState, useEffect, useMemo } = React;
 
-    // =========================================================================
-    // BỘ CHUẨN HÓA VĂN BẢN & CÔNG THỨC HÓA HỌC
-    // =========================================================================
     function normalizeText(str) {
       if (!str) return "";
       const subMap = {
@@ -48,10 +45,18 @@
 
     function normalizeCode(code) {
       if (!code) return "";
-      return String(code).toLowerCase().replace(/\s+/g, "").trim();
+      return String(code).toLowerCase().replace(/[^a-z0-9-]/g, "").trim();
     }
 
-    // Dữ liệu mẫu có sẵn Mã câu hỏi chuẩn GDPT 2018 (Danh pháp IUPAC)
+    // Tự động tách mã nếu thầy dán nguyên dòng kiểu "[9KL-06] Nội dung câu hỏi..."
+    function extractLeadingCode(rawContent) {
+      const match = rawContent.trim().match(/^\[([A-Za-z0-9-_]+)\]\s*(.*)$/s);
+      if (match) {
+        return { extractedCode: match[1].toUpperCase(), cleanContent: match[2].trim() };
+      }
+      return { extractedCode: "", cleanContent: rawContent };
+    }
+
     const SAMPLE_QUESTIONS = [
       {
         id: "q1",
@@ -155,10 +160,10 @@
       const [mode, setMode] = useState("lookup");
       const [questions, setQuestions] = useState(SAMPLE_QUESTIONS);
 
-      // State Tra cứu kết hợp Mã câu hỏi & Từ khóa
+      // State Tra cứu
       const [searchQuery, setSearchQuery] = useState("");
       const [chapterFilter, setChapterFilter] = useState("ALL");
-      const [searchAllGrades, setSearchAllGrades] = useState(true); // Mặc định tìm theo mã trên toàn hệ thống
+      const [searchAllGrades, setSearchAllGrades] = useState(true);
       const [revealedHints, setRevealedHints] = useState({});
       const [revealedSol, setRevealedSol] = useState({});
 
@@ -169,8 +174,13 @@
       const [timeLeft, setTimeLeft] = useState(900);
 
       // State Admin
+      const [adminSubTab, setAdminSubTab] = useState("single"); // 'single' | 'bulk' | 'grades'
       const [newGradeName, setNewGradeName] = useState("");
       const [newGradeId, setNewGradeId] = useState("");
+      const [bulkText, setBulkText] = useState("");
+      const [bulkGradeId, setBulkGradeId] = useState("9");
+      const [bulkChapter, setBulkChapter] = useState("Kim loại & Phi kim");
+
       const [newQ, setNewQ] = useState({
         question_code: "",
         grade_id: "9",
@@ -306,6 +316,16 @@
         alert("Đã mở thêm khối lớp mới!");
       }
 
+      // Khi thầy dán đề có dạng "[9KL-06] Nội dung..." vào ô đề bài -> tự điền Mã câu hỏi
+      function handleContentChange(val) {
+        const { extractedCode, cleanContent } = extractLeadingCode(val);
+        if (extractedCode && !newQ.question_code) {
+          setNewQ({ ...newQ, question_code: extractedCode, content: cleanContent });
+        } else {
+          setNewQ({ ...newQ, content: val });
+        }
+      }
+
       async function handleAddQuestion(e) {
         e.preventDefault();
         if (!isAdmin) return alert("Chỉ tài khoản Giáo viên mới có quyền thêm câu hỏi!");
@@ -320,8 +340,13 @@
         const hintsArr = [newQ.hint1, newQ.hint2].filter((h) => h && h.trim() !== "");
         const cleanCode = newQ.question_code.trim().toUpperCase();
 
+        if (!cleanCode) {
+          alert("Thầy vui lòng nhập Mã câu hỏi (VD: 9KL-06) để học sinh tra cứu chính xác!");
+          return;
+        }
+
         const payload = {
-          question_code: cleanCode || null,
+          question_code: cleanCode,
           grade_id: newQ.grade_id,
           chapter: newQ.chapter,
           type: newQ.type,
@@ -335,10 +360,11 @@
 
         const { data, error } = await supabase.from("questions").insert(payload).select();
         if (error) {
-          alert("Lỗi lưu lên Supabase: " + error.message);
+          alert("Lỗi lưu lên Supabase: " + error.message + "
+(Thầy kiểm tra xem đã chạy lệnh ALTER TABLE questions ADD COLUMN question_code TEXT trên Supabase chưa nhé!)");
         } else if (data) {
           setQuestions([data[0], ...questions]);
-          alert(`Đã lưu câu hỏi ${cleanCode ? "[" + cleanCode + "] " : ""}thành công!`);
+          alert(`Đã lưu thành công câu hỏi có Mã: [${cleanCode}]!`);
           setNewQ({
             ...newQ,
             question_code: "",
@@ -349,6 +375,49 @@
             hint2: "",
             explanation: ""
           });
+        }
+      }
+
+      // Nhập nhanh nhiều câu hỏi cùng lúc theo định dạng: MÃ | ĐỀ BÀI | ĐÁP ÁN | GỢI Ý | LỜI GIẢI
+      async function handleBulkImport(e) {
+        e.preventDefault();
+        if (!isAdmin) return;
+        const lines = bulkText.split("
+").map((l) => l.trim()).filter(Boolean);
+        if (lines.length === 0) return;
+
+        const rowsToInsert = [];
+        for (const line of lines) {
+          const parts = line.split("|").map((p) => p.trim());
+          if (parts.length < 3) continue;
+          const [code, content, ans, hint = "", exp = ""] = parts;
+          const cleanCode = code.toUpperCase();
+          rowsToInsert.push({
+            question_code: cleanCode,
+            grade_id: bulkGradeId,
+            chapter: bulkChapter,
+            type: "short_answer",
+            content,
+            options: [],
+            correct_answer: ans,
+            hints: hint ? [hint] : [],
+            explanation: exp || `Đáp án chuẩn: ${ans}`,
+            search_index: normalizeText(`${cleanCode} ${bulkChapter} ${content}`)
+          });
+        }
+
+        if (rowsToInsert.length === 0) {
+          alert("Chưa đúng định dạng! Mỗi dòng cần có ít nhất: MÃ | ĐỀ BÀI | ĐÁP ÁN");
+          return;
+        }
+
+        const { data, error } = await supabase.from("questions").insert(rowsToInsert).select();
+        if (error) {
+          alert("Lỗi nhập hàng loạt: " + error.message);
+        } else if (data) {
+          setQuestions([...data, ...questions]);
+          setBulkText("");
+          alert(`Đã nạp thành công ${data.length} câu hỏi kèm Mã tra cứu lên hệ thống!`);
         }
       }
 
@@ -369,15 +438,11 @@
         return ["ALL", ...Array.from(set)];
       }, [questions, gradeQuestions, searchAllGrades, searchQuery]);
 
-      // =======================================================================
-      // BỘ LỌC TÌM KIẾM KẾT HỢP: ƯU TIÊN MÃ CÂU HỎI -> TỪ KHÓA ĐỀ BÀI
-      // =======================================================================
       const combinedSearchResults = useMemo(() => {
         const rawTrim = searchQuery.trim();
         const normCodeQuery = normalizeCode(rawTrim);
         const normTextQuery = normalizeText(rawTrim);
 
-        // Nếu đang nhập từ khóa và bật chế độ tìm toàn hệ thống -> tìm cả Khối 9 & 10 để học sinh gõ mã là ra ngay
         const pool = (rawTrim && searchAllGrades) ? questions : gradeQuestions;
 
         return pool
@@ -387,17 +452,14 @@
 
             const qCode = normalizeCode(q.question_code);
 
-            // 1. Khớp chính xác 100% Mã câu hỏi (VD: gõ "9KL-01" hoặc "9kl-01")
             if (qCode && qCode === normCodeQuery) {
               return { ...q, matchType: "exact_code", priority: 100 };
             }
 
-            // 2. Khớp một phần Mã câu hỏi (VD: gõ "9KL" ra toàn bộ câu có mã bắt đầu bằng 9KL)
             if (qCode && normCodeQuery.length >= 2 && qCode.includes(normCodeQuery)) {
               return { ...q, matchType: "partial_code", priority: 80 };
             }
 
-            // 3. Tìm theo từ khóa nội dung câu hỏi (không dấu + chuẩn hóa H2SO4)
             const tokens = normTextQuery.split(" ").filter((t) => t.length > 0);
             if (tokens.length === 0) return { ...q, matchType: "none", priority: -1 };
 
@@ -461,7 +523,10 @@
               <div className="flex items-center gap-3">
                 <div className="bg-amber-400 text-teal-950 font-extrabold px-3 py-1.5 rounded-lg text-lg">H₂O</div>
                 <div>
-                  <h1 className="font-bold text-lg leading-tight">HÓA HỌC THẦY CHIẾN</h1>
+                  <div className="flex items-center gap-2">
+                    <h1 className="font-bold text-lg leading-tight">HÓA HỌC THẦY CHIẾN</h1>
+                    <span className="text-[11px] bg-teal-950 text-amber-300 font-mono px-2 py-0.5 rounded">v4.0</span>
+                  </div>
                   <p className="text-xs text-teal-200">Tra cứu theo Mã câu hỏi & Từ khóa • Luyện tập • Kiểm tra</p>
                 </div>
               </div>
@@ -507,7 +572,7 @@
                 { id: "lookup", label: "🔍 1. Tra cứu Mã câu & Đề bài" },
                 { id: "practice", label: "🎯 2. Luyện tập chuyên đề" },
                 { id: "exam", label: "⏱️ 3. Kiểm tra / Thi thử" },
-                ...(isAdmin ? [{ id: "admin", label: "🛡️ Quản trị Giáo viên (Admin)" }] : [])
+                ...(isAdmin ? [{ id: "admin", label: "🛡️ Quản trị Giáo viên (Nhập Mã & Đề)" }] : [])
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -528,7 +593,7 @@
 
           {/* Nội dung chính */}
           <main className="max-w-5xl w-full mx-auto px-4 py-6 flex-1">
-            {/* CHẾ ĐỘ 1: TRA CỨU KẾT HỢP MÃ CÂU HỎI & TỪ KHÓA */}
+            {/* CHẾ ĐỘ 1: TRA CỨU */}
             {mode === "lookup" && (
               <div className="space-y-4">
                 <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-3">
@@ -578,7 +643,6 @@
                     </select>
                   </div>
 
-                  {/* Gợi ý bấm nhanh mã mẫu */}
                   <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 pt-1">
                     <span>Thử tra nhanh theo mã:</span>
                     {["9KL-01", "9HC-02", "9KL-05", "10NT-01"].map((sampleCode) => (
@@ -827,160 +891,244 @@
             {/* CHẾ ĐỘ 4: QUẢN TRỊ ĐỘC QUYỀN CỦA GIÁO VIÊN */}
             {mode === "admin" && isAdmin && (
               <div className="space-y-6">
-                {/* Mở rộng khối lớp */}
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-amber-200">
-                  <h2 className="font-bold text-base text-amber-900 mb-3">1. Quản lý & Mở rộng Khối lớp</h2>
-                  <form onSubmit={handleAddGrade} className="flex flex-wrap gap-3">
-                    <input
-                      required
-                      placeholder="Mã khối (VD: 8, 11, ONTHI)"
-                      value={newGradeId}
-                      onChange={(e) => setNewGradeId(e.target.value)}
-                      className="border rounded-lg px-3 py-2 text-sm"
-                    />
-                    <input
-                      required
-                      placeholder="Tên hiển thị (VD: Khối 8, Ôn thi vào 10)"
-                      value={newGradeName}
-                      onChange={(e) => setNewGradeName(e.target.value)}
-                      className="border rounded-lg px-3 py-2 text-sm flex-1"
-                    />
-                    <button type="submit" className="bg-amber-600 text-white font-semibold px-4 py-2 rounded-lg text-sm hover:bg-amber-700">
-                      + Thêm khối lớp
-                    </button>
-                  </form>
+                {/* Thanh chuyển chế độ nhập liệu trong Admin */}
+                <div className="flex flex-wrap gap-2 bg-amber-50 p-3 rounded-xl border border-amber-200">
+                  <button
+                    onClick={() => setAdminSubTab("single")}
+                    className={`px-4 py-2 rounded-lg text-sm font-bold ${adminSubTab === "single" ? "bg-teal-700 text-white" : "bg-white text-slate-700 border"}`}
+                  >
+                    ✍️ Nhập từng câu (Kèm Mã câu hỏi)
+                  </button>
+                  <button
+                    onClick={() => setAdminSubTab("bulk")}
+                    className={`px-4 py-2 rounded-lg text-sm font-bold ${adminSubTab === "bulk" ? "bg-teal-700 text-white" : "bg-white text-slate-700 border"}`}
+                  >
+                    ⚡ Nhập hàng loạt nhiều câu có sẵn Mã
+                  </button>
+                  <button
+                    onClick={() => setAdminSubTab("grades")}
+                    className={`px-4 py-2 rounded-lg text-sm font-bold ${adminSubTab === "grades" ? "bg-amber-600 text-white" : "bg-white text-slate-700 border"}`}
+                  >
+                    📚 Mở rộng Khối lớp
+                  </button>
                 </div>
 
-                {/* Thêm câu hỏi kèm Mã định danh */}
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
-                  <h2 className="font-bold text-lg text-teal-800">2. Thêm câu hỏi mới & Gắn Mã tra cứu</h2>
-                  <form onSubmit={handleAddQuestion} className="space-y-3">
-                    <div className="grid sm:grid-cols-4 gap-3">
-                      <div>
-                        <label className="block text-xs font-bold text-teal-800 mb-1">Mã câu hỏi (In trên phiếu)</label>
-                        <input
-                          required
-                          placeholder="VD: 9KL-06"
-                          value={newQ.question_code}
-                          onChange={(e) => setNewQ({ ...newQ, question_code: e.target.value })}
-                          className="w-full border-2 border-teal-500/40 rounded-lg p-2 text-sm font-mono uppercase"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-semibold mb-1">Khối lớp</label>
-                        <select
-                          value={newQ.grade_id}
-                          onChange={(e) => setNewQ({ ...newQ, grade_id: e.target.value })}
-                          className="w-full border rounded-lg p-2 text-sm"
-                        >
-                          {grades.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-xs font-semibold mb-1">Chương / Chủ đề</label>
-                        <input
-                          required
-                          value={newQ.chapter}
-                          onChange={(e) => setNewQ({ ...newQ, chapter: e.target.value })}
-                          className="w-full border rounded-lg p-2 text-sm"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-semibold mb-1">Dạng câu hỏi</label>
-                        <select
-                          value={newQ.type}
-                          onChange={(e) => setNewQ({ ...newQ, type: e.target.value })}
-                          className="w-full border rounded-lg p-2 text-sm"
-                        >
-                          <option value="mcq">Trắc nghiệm nhiều lựa chọn</option>
-                          <option value="true_false">Trắc nghiệm Đúng/Sai (4 ý)</option>
-                          <option value="fill_blank">Điền khuyết</option>
-                          <option value="short_answer">Trả lời ngắn</option>
-                          <option value="essay">Tự luận</option>
-                        </select>
-                      </div>
+                {/* TAB CON 1: NHẬP TỪNG CÂU HỎI */}
+                {adminSubTab === "single" && (
+                  <div className="bg-white p-6 rounded-xl shadow-sm border-2 border-teal-600/30 space-y-4">
+                    <div className="border-b pb-3">
+                      <h2 className="font-bold text-lg text-teal-800">Thêm câu hỏi mới & Gắn Mã tra cứu</h2>
+                      <p className="text-xs text-slate-500">Mẹo: Nếu thầy dán đề có dạng <code className="bg-slate-100 px-1 rounded">[9KL-06] Nội dung câu hỏi...</code> vào ô đề bài, hệ thống sẽ tự bóc tách <strong>9KL-06</strong> điền vào ô Mã câu hỏi.</p>
                     </div>
 
+                    <form onSubmit={handleAddQuestion} className="space-y-4">
+                      {/* Dòng 1: Ô Mã câu hỏi nổi bật */}
+                      <div className="bg-teal-50/70 p-4 rounded-xl border border-teal-200 grid sm:grid-cols-4 gap-3">
+                        <div>
+                          <label className="block text-xs font-extrabold text-teal-900 uppercase mb-1">
+                            🔑 Mã câu hỏi (Bắt buộc)
+                          </label>
+                          <input
+                            required
+                            placeholder="VD: 9KL-06"
+                            value={newQ.question_code}
+                            onChange={(e) => setNewQ({ ...newQ, question_code: e.target.value })}
+                            className="w-full border-2 border-teal-600 bg-white rounded-lg p-2 text-sm font-mono font-bold uppercase text-teal-950"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold mb-1">Khối lớp</label>
+                          <select
+                            value={newQ.grade_id}
+                            onChange={(e) => setNewQ({ ...newQ, grade_id: e.target.value })}
+                            className="w-full border rounded-lg p-2 text-sm bg-white"
+                          >
+                            {grades.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold mb-1">Chương / Chủ đề</label>
+                          <input
+                            required
+                            value={newQ.chapter}
+                            onChange={(e) => setNewQ({ ...newQ, chapter: e.target.value })}
+                            className="w-full border rounded-lg p-2 text-sm bg-white"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold mb-1">Dạng câu hỏi</label>
+                          <select
+                            value={newQ.type}
+                            onChange={(e) => setNewQ({ ...newQ, type: e.target.value })}
+                            className="w-full border rounded-lg p-2 text-sm bg-white"
+                          >
+                            <option value="mcq">Trắc nghiệm nhiều lựa chọn</option>
+                            <option value="true_false">Trắc nghiệm Đúng/Sai (4 ý)</option>
+                            <option value="fill_blank">Điền khuyết</option>
+                            <option value="short_answer">Trả lời ngắn</option>
+                            <option value="essay">Tự luận</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold mb-1">Nội dung câu hỏi</label>
+                        <textarea
+                          required
+                          rows="2"
+                          value={newQ.content}
+                          onChange={(e) => handleContentChange(e.target.value)}
+                          className="w-full border rounded-lg p-2.5 text-sm"
+                          placeholder="Nhập hoặc dán nội dung đề bài (có thể dán kèm [MÃ] ở đầu)..."
+                        />
+                      </div>
+
+                      {(newQ.type === "mcq" || newQ.type === "true_false") && (
+                        <div className="grid sm:grid-cols-2 gap-2">
+                          <input placeholder="Lựa chọn A / Ý a)" value={newQ.optA} onChange={(e) => setNewQ({ ...newQ, optA: e.target.value })} className="border rounded-lg p-2 text-sm" />
+                          <input placeholder="Lựa chọn B / Ý b)" value={newQ.optB} onChange={(e) => setNewQ({ ...newQ, optB: e.target.value })} className="border rounded-lg p-2 text-sm" />
+                          <input placeholder="Lựa chọn C / Ý c)" value={newQ.optC} onChange={(e) => setNewQ({ ...newQ, optC: e.target.value })} className="border rounded-lg p-2 text-sm" />
+                          <input placeholder="Lựa chọn D / Ý d)" value={newQ.optD} onChange={(e) => setNewQ({ ...newQ, optD: e.target.value })} className="border rounded-lg p-2 text-sm" />
+                        </div>
+                      )}
+
+                      <div className="grid sm:grid-cols-3 gap-3">
+                        <div>
+                          <label className="block text-xs font-semibold mb-1">Đáp án chuẩn</label>
+                          <input
+                            required
+                            placeholder="VD: Iron (Fe) hoặc Đúng, Sai, Đúng, Sai"
+                            value={newQ.correct_answer}
+                            onChange={(e) => setNewQ({ ...newQ, correct_answer: e.target.value })}
+                            className="w-full border rounded-lg p-2 text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold mb-1">Gợi ý bước 1 (Tra cứu)</label>
+                          <input
+                            placeholder="VD: Tính số mol chất tham gia..."
+                            value={newQ.hint1}
+                            onChange={(e) => setNewQ({ ...newQ, hint1: e.target.value })}
+                            className="w-full border rounded-lg p-2 text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold mb-1">Gợi ý bước 2 (Tùy chọn)</label>
+                          <input
+                            placeholder="VD: Áp dụng V = n × 24,79..."
+                            value={newQ.hint2}
+                            onChange={(e) => setNewQ({ ...newQ, hint2: e.target.value })}
+                            className="w-full border rounded-lg p-2 text-sm"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold mb-1">Lời giải chi tiết</label>
+                        <textarea
+                          rows="2"
+                          value={newQ.explanation}
+                          onChange={(e) => setNewQ({ ...newQ, explanation: e.target.value })}
+                          className="w-full border rounded-lg p-2.5 text-sm"
+                          placeholder="Trình bày lời giải chi tiết để học sinh đối chiếu khi tra mã..."
+                        />
+                      </div>
+
+                      <button type="submit" className="bg-teal-700 text-white font-bold px-5 py-2.5 rounded-lg hover:bg-teal-800 shadow-sm">
+                        + Lưu câu hỏi & Mã [{newQ.question_code ? newQ.question_code.toUpperCase() : "..."}] lên hệ thống
+                      </button>
+                    </form>
+                  </div>
+                )}
+
+                {/* TAB CON 2: NHẬP HÀNG LOẠT NHIỀU CÂU CÓ SẴN MÃ */}
+                {adminSubTab === "bulk" && (
+                  <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
                     <div>
-                      <label className="block text-xs font-semibold mb-1">Nội dung câu hỏi</label>
+                      <h2 className="font-bold text-lg text-teal-800">Nhập nhanh hàng loạt câu hỏi có sẵn Mã</h2>
+                      <p className="text-xs text-slate-600 mt-1">
+                        Mỗi câu nhập trên 1 dòng theo cấu trúc ngăn cách bởi dấu gạch đứng <code className="bg-slate-100 px-1.5 py-0.5 rounded font-bold">|</code>:
+                        <br />
+                        <span className="font-mono text-teal-800">MÃ CÂU HỎI | NỘI DUNG ĐỀ BÀI | ĐÁP ÁN | GỢI Ý (tùy chọn) | LỜI GIẢI CHI TIẾT (tùy chọn)</span>
+                      </p>
+                    </div>
+
+                    <form onSubmit={handleBulkImport} className="space-y-3">
+                      <div className="grid sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-semibold mb-1">Áp dụng cho Khối lớp</label>
+                          <select
+                            value={bulkGradeId}
+                            onChange={(e) => setBulkGradeId(e.target.value)}
+                            className="w-full border rounded-lg p-2 text-sm"
+                          >
+                            {grades.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold mb-1">Áp dụng cho Chương / Chủ đề</label>
+                          <input
+                            required
+                            value={bulkChapter}
+                            onChange={(e) => setBulkChapter(e.target.value)}
+                            className="w-full border rounded-lg p-2 text-sm"
+                          />
+                        </div>
+                      </div>
+
                       <textarea
                         required
-                        rows="2"
-                        value={newQ.content}
-                        onChange={(e) => setNewQ({ ...newQ, content: e.target.value })}
-                        className="w-full border rounded-lg p-2 text-sm"
-                        placeholder="Nhập đề bài..."
+                        rows="6"
+                        value={bulkText}
+                        onChange={(e) => setBulkText(e.target.value)}
+                        placeholder={"Ví dụ:
+9KL-10 | Hòa tan 2,4g Mg vào HCl dư thu được bao nhiêu lít H2 (đkc)? | 2,479 L | Tính n(Mg) = 2,4/24 = 0,1 mol | Mg + 2HCl -> MgCl2 + H2 => V = 0,1 x 24,79 = 2,479 L
+9KL-11 | Kim loại nào dẫn điện tốt nhất? | Silver (Ag) | Nhớ lại thứ tự dẫn điện: Ag > Cu > Au > Al | Silver (Ag) là kim loại dẫn điện tốt nhất."}
+                        className="w-full border rounded-lg p-3 text-sm font-mono"
                       />
-                    </div>
 
-                    {(newQ.type === "mcq" || newQ.type === "true_false") && (
-                      <div className="grid sm:grid-cols-2 gap-2">
-                        <input placeholder="Lựa chọn A / Ý a)" value={newQ.optA} onChange={(e) => setNewQ({ ...newQ, optA: e.target.value })} className="border rounded-lg p-2 text-sm" />
-                        <input placeholder="Lựa chọn B / Ý b)" value={newQ.optB} onChange={(e) => setNewQ({ ...newQ, optB: e.target.value })} className="border rounded-lg p-2 text-sm" />
-                        <input placeholder="Lựa chọn C / Ý c)" value={newQ.optC} onChange={(e) => setNewQ({ ...newQ, optC: e.target.value })} className="border rounded-lg p-2 text-sm" />
-                        <input placeholder="Lựa chọn D / Ý d)" value={newQ.optD} onChange={(e) => setNewQ({ ...newQ, optD: e.target.value })} className="border rounded-lg p-2 text-sm" />
-                      </div>
-                    )}
+                      <button type="submit" className="bg-teal-700 text-white font-bold px-5 py-2.5 rounded-lg hover:bg-teal-800">
+                        ⚡ Nạp toàn bộ danh sách câu hỏi lên hệ thống
+                      </button>
+                    </form>
+                  </div>
+                )}
 
-                    <div className="grid sm:grid-cols-3 gap-3">
-                      <div>
-                        <label className="block text-xs font-semibold mb-1">Đáp án chuẩn</label>
-                        <input
-                          required
-                          placeholder="VD: Iron (Fe) hoặc Đúng, Sai, Đúng, Sai"
-                          value={newQ.correct_answer}
-                          onChange={(e) => setNewQ({ ...newQ, correct_answer: e.target.value })}
-                          className="w-full border rounded-lg p-2 text-sm"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-semibold mb-1">Gợi ý bước 1 (Tra cứu)</label>
-                        <input
-                          placeholder="VD: Tính số mol chất tham gia..."
-                          value={newQ.hint1}
-                          onChange={(e) => setNewQ({ ...newQ, hint1: e.target.value })}
-                          className="w-full border rounded-lg p-2 text-sm"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-semibold mb-1">Gợi ý bước 2 (Tùy chọn)</label>
-                        <input
-                          placeholder="VD: Áp dụng V = n × 24,79..."
-                          value={newQ.hint2}
-                          onChange={(e) => setNewQ({ ...newQ, hint2: e.target.value })}
-                          className="w-full border rounded-lg p-2 text-sm"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-semibold mb-1">Lời giải chi tiết</label>
-                      <textarea
-                        rows="2"
-                        value={newQ.explanation}
-                        onChange={(e) => setNewQ({ ...newQ, explanation: e.target.value })}
-                        className="w-full border rounded-lg p-2 text-sm"
-                        placeholder="Trình bày lời giải chi tiết để học sinh đối chiếu..."
+                {/* TAB CON 3: MỞ RỘNG KHỐI LỚP */}
+                {adminSubTab === "grades" && (
+                  <div className="bg-white p-5 rounded-xl shadow-sm border border-amber-200">
+                    <h2 className="font-bold text-base text-amber-900 mb-3">Quản lý & Mở rộng Khối lớp</h2>
+                    <form onSubmit={handleAddGrade} className="flex flex-wrap gap-3">
+                      <input
+                        required
+                        placeholder="Mã khối (VD: 8, 11, ONTHI)"
+                        value={newGradeId}
+                        onChange={(e) => setNewGradeId(e.target.value)}
+                        className="border rounded-lg px-3 py-2 text-sm"
                       />
-                    </div>
-
-                    <button type="submit" className="bg-teal-700 text-white font-bold px-5 py-2.5 rounded-lg hover:bg-teal-800">
-                      + Lưu câu hỏi & Mã tra cứu lên hệ thống
-                    </button>
-                  </form>
-                </div>
+                      <input
+                        required
+                        placeholder="Tên hiển thị (VD: Khối 8, Ôn thi vào 10)"
+                        value={newGradeName}
+                        onChange={(e) => setNewGradeName(e.target.value)}
+                        className="border rounded-lg px-3 py-2 text-sm flex-1"
+                      />
+                      <button type="submit" className="bg-amber-600 text-white font-semibold px-4 py-2 rounded-lg text-sm hover:bg-amber-700">
+                        + Thêm khối lớp
+                      </button>
+                    </form>
+                  </div>
+                )}
 
                 {/* Danh sách quản lý & xóa câu hỏi */}
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-3">
-                  <h2 className="font-bold text-lg text-slate-800">3. Danh sách câu hỏi hiện có ({questions.length} câu)</h2>
+                  <h2 className="font-bold text-lg text-slate-800">Danh sách câu hỏi & Mã đã lưu ({questions.length} câu)</h2>
                   {questions.map((q) => (
                     <div key={q.id} className="flex justify-between items-start gap-3 p-3 border rounded-lg text-sm">
                       <div>
-                        {q.question_code && (
-                          <span className="font-mono font-bold bg-teal-100 text-teal-900 px-2 py-0.5 rounded mr-2">
-                            {q.question_code}
-                          </span>
-                        )}
+                        <span className="font-mono font-bold bg-teal-700 text-white px-2 py-0.5 rounded mr-2">
+                          {q.question_code || "CHƯA CÓ MÃ"}
+                        </span>
                         <span className="text-xs font-bold text-slate-500">[Khối {q.grade_id} - {q.chapter}] </span>
                         <span>{q.content}</span>
                       </div>
