@@ -3,60 +3,85 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hóa Học Thầy Chiến (v4.2) - Tra cứu Mã câu hỏi & Luyện thi</title>
+  <title>Hóa Học Thầy Chiến (v4.3) - Tra cứu Mã câu hỏi & Luyện thi</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased">
-  <div id="root">
-    <div style="padding: 40px; text-align: center; font-family: sans-serif; color: #0f766e;">
-      Đang tải hệ thống Hóa Học Thầy Chiến...
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <!-- HEADER -->
+  <header class="bg-teal-800 text-white shadow-md">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="bg-amber-400 text-teal-950 font-extrabold px-3 py-1.5 rounded-lg text-lg">H₂O</div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-bold text-lg leading-tight">HÓA HỌC THẦY CHIẾN</h1>
+            <span class="text-[11px] bg-teal-950 text-amber-300 font-mono px-2 py-0.5 rounded">v4.3</span>
+          </div>
+          <p class="text-xs text-teal-200">Tra cứu theo Mã câu hỏi & Từ khóa • Luyện tập • Kiểm tra</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 flex-wrap">
+        <div id="grade-buttons" class="flex gap-1.5 flex-wrap"></div>
+        <div id="auth-area"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- NAVIGATION TABS -->
+  <nav class="bg-white border-b border-slate-200 sticky top-0 z-10">
+    <div id="nav-tabs" class="max-w-6xl mx-auto px-4 flex overflow-x-auto gap-2 py-2.5"></div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main id="app-main" class="max-w-5xl w-full mx-auto px-4 py-6 flex-1"></main>
+
+  <!-- AUTH MODAL -->
+  <div id="auth-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-xl">
+      <div class="flex justify-between items-center border-b pb-3">
+        <div class="flex gap-2">
+          <button type="button" onclick="switchAuthTab('login')" id="tab-login" class="text-xs font-bold px-2.5 py-1.5 rounded bg-teal-700 text-white">Đăng nhập</button>
+          <button type="button" onclick="switchAuthTab('register_student')" id="tab-register_student" class="text-xs font-bold px-2.5 py-1.5 rounded bg-slate-100">ĐK Học sinh</button>
+          <button type="button" onclick="switchAuthTab('register_admin')" id="tab-register_admin" class="text-xs font-bold px-2.5 py-1.5 rounded bg-slate-100">ĐK Giáo viên</button>
+        </div>
+        <button onclick="closeAuthModal()" class="text-slate-400 hover:text-slate-700 font-bold">✕</button>
+      </div>
+
+      <form onsubmit="handleAuthSubmit(event)" class="space-y-3">
+        <div id="register-fields" class="hidden space-y-3">
+          <input id="auth-fullname" placeholder="Họ và tên..." class="w-full border rounded-lg p-2.5 text-sm" />
+          <div id="student-extra" class="grid grid-cols-2 gap-2">
+            <input id="auth-classname" value="9D" placeholder="Lớp (VD: 9D, 10A1)" class="border rounded-lg p-2.5 text-sm" />
+            <input id="auth-student-code" placeholder="Mã lớp (THAYCHIEN)" class="border rounded-lg p-2.5 text-sm" />
+          </div>
+          <div id="admin-extra" class="hidden">
+            <input id="auth-admin-code" type="password" placeholder="Mã bí mật Giáo viên (ADMIN_THAYCHIEN)" class="w-full border border-amber-400 rounded-lg p-2.5 text-sm" />
+          </div>
+        </div>
+        <input id="auth-email" required type="email" placeholder="Email đăng nhập" class="w-full border rounded-lg p-2.5 text-sm" />
+        <input id="auth-password" required type="password" placeholder="Mật khẩu (tối thiểu 6 ký tự)" class="w-full border rounded-lg p-2.5 text-sm" />
+        <button type="submit" id="auth-submit-btn" class="w-full bg-teal-700 hover:bg-teal-800 text-white font-bold py-2.5 rounded-lg">
+          Đăng nhập hệ thống
+        </button>
+      </form>
     </div>
   </div>
 
-  <script type="text/babel" data-presets="react">
+  <script>
+    // =========================================================================
+    // KẾT NỐI SUPABASE DỰ ÁN "HOÁ HỌC - THẦY CHIẾN"
+    // =========================================================================
     const SUPABASE_URL = "https://tfmexicqxbuznmvtepzq.supabase.co";
     const SUPABASE_KEY = "sb_publishable_gC4WzQW2X2bhuAX4QpPzcg_EBHDDGMg";
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const STUDENT_CLASS_CODE = "THAYCHIEN";
     const TEACHER_ADMIN_CODE = "ADMIN_THAYCHIEN";
 
-    const { useState, useEffect, useMemo } = React;
-
-    function normalizeText(str) {
-      if (!str) return "";
-      const subMap = {
-        "₀": "0", "₁": "1", "₂": "2", "₃": "3", "₄": "4",
-        "₅": "5", "₆": "6", "₇": "7", "₈": "8", "₉": "9"
-      };
-      return String(str)
-        .toLowerCase()
-        .replace(/[₀-₉]/g, (m) => subMap[m] || m)
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/đ/g, "d")
-        .replace(/[^a-z0-9\s.,-]/g, " ")
-        .replace(/\s+/g, " ")
-        .trim();
-    }
-
-    function normalizeCode(code) {
-      if (!code) return "";
-      return String(code).toLowerCase().replace(/[^a-z0-9-]/g, "").trim();
-    }
-
-    function extractLeadingCode(rawContent) {
-      const match = rawContent.trim().match(/^\[([A-Za-z0-9-_]+)\]\s*(.*)$/s);
-      if (match) {
-        return { extractedCode: match[1].toUpperCase(), cleanContent: match[2].trim() };
-      }
-      return { extractedCode: "", cleanContent: rawContent };
-    }
-
+    // Dữ liệu mẫu chuẩn GDPT 2018 (Danh pháp IUPAC)
     const SAMPLE_QUESTIONS = [
       {
         id: "q1",
@@ -142,1071 +167,903 @@
       }
     ];
 
-    function App() {
-      const [user, setUser] = useState(null);
-      const [authModal, setAuthModal] = useState(false);
-      const [authTab, setAuthTab] = useState("login");
-      const [email, setEmail] = useState("");
-      const [password, setPassword] = useState("");
-      const [fullName, setFullName] = useState("");
-      const [className, setClassName] = useState("9D");
-      const [secretCode, setSecretCode] = useState("");
-
-      const [grades, setGrades] = useState([
+    // Trạng thái toàn cục của ứng dụng
+    const state = {
+      user: null,
+      authTab: "login",
+      grades: [
         { id: "9", name: "Khối 9", description: "KHTN 9 - Phân môn Hóa học (KNTT)" },
         { id: "10", name: "Khối 10", description: "Hóa học 10 (KNTT)" }
-      ]);
-      const [selectedGrade, setSelectedGrade] = useState("9");
-      const [mode, setMode] = useState("lookup");
-      const [questions, setQuestions] = useState(SAMPLE_QUESTIONS);
-
-      const [searchQuery, setSearchQuery] = useState("");
-      const [chapterFilter, setChapterFilter] = useState("ALL");
-      const [searchAllGrades, setSearchAllGrades] = useState(true);
-      const [revealedHints, setRevealedHints] = useState({});
-      const [revealedSol, setRevealedSol] = useState({});
-
-      const [answers, setAnswers] = useState({});
-      const [checkedPractice, setCheckedPractice] = useState({});
-      const [examSubmitted, setExamSubmitted] = useState(false);
-      const [timeLeft, setTimeLeft] = useState(900);
-
-      const [adminSubTab, setAdminSubTab] = useState("single");
-      const [newGradeName, setNewGradeName] = useState("");
-      const [newGradeId, setNewGradeId] = useState("");
-      const [bulkText, setBulkText] = useState("");
-      const [bulkGradeId, setBulkGradeId] = useState("9");
-      const [bulkChapter, setBulkChapter] = useState("Kim loại & Phi kim");
-
-      const [newQ, setNewQ] = useState({
-        question_code: "",
-        grade_id: "9",
-        chapter: "Kim loại & Phi kim",
-        type: "mcq",
-        content: "",
-        optA: "", optB: "", optC: "", optD: "",
-        correct_answer: "",
-        hint1: "",
-        hint2: "",
-        explanation: ""
-      });
-
-      const isAdmin = user && user.role === "admin";
-
-      useEffect(() => {
-        checkSession();
-        loadFromSupabase();
-      }, []);
-
-      useEffect(() => {
-        if (mode !== "exam" || examSubmitted) return;
-        const timer = setInterval(() => {
-          setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
-        }, 1000);
-        return () => clearInterval(timer);
-      }, [mode, examSubmitted]);
-
-      async function checkSession() {
-        try {
-          const { data } = await supabase.auth.getSession();
-          if (data && data.session && data.session.user) {
-            await fetchUserProfile(data.session.user);
-          }
-        } catch (e) {
-          console.log(e);
-        }
-      }
-
-      async function fetchUserProfile(authUser) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", authUser.id)
-          .single();
-
-        if (profile) {
-          setUser({
-            id: authUser.id,
-            email: authUser.email,
-            full_name: profile.full_name,
-            role: profile.role || "student",
-            class_name: profile.class_name
-          });
-        } else {
-          setUser({
-            id: authUser.id,
-            email: authUser.email,
-            full_name: authUser.email.split("@")[0],
-            role: "student"
-          });
-        }
-      }
-
-      async function loadFromSupabase() {
-        try {
-          const { data: gData } = await supabase.from("grades").select("*").eq("is_active", true);
-          if (gData && gData.length > 0) setGrades(gData);
-
-          const { data: qData } = await supabase.from("questions").select("*").order("created_at", { ascending: false });
-          if (qData && qData.length > 0) setQuestions(qData);
-        } catch (err) {
-          console.log("Đang dùng dữ liệu mẫu:", err.message);
-        }
-      }
-
-      async function handleAuth(e) {
-        e.preventDefault();
-        if (authTab === "login") {
-          const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-          if (error) return alert("Đăng nhập thất bại: " + error.message);
-          await fetchUserProfile(data.user);
-          setAuthModal(false);
-          return;
-        }
-
-        const targetRole = authTab === "register_admin" ? "admin" : "student";
-        const expectedCode = targetRole === "admin" ? TEACHER_ADMIN_CODE : STUDENT_CLASS_CODE;
-
-        if (secretCode.trim().toUpperCase() !== expectedCode) {
-          alert(
-            targetRole === "admin"
-              ? "Mã xác thực Giáo viên không chính xác!"
-              : "Mã lớp học sinh chưa đúng! Vui lòng nhập mã do Thầy Chiến cung cấp."
-          );
-          return;
-        }
-
-        const { data, error } = await supabase.auth.signUp({ email, password });
-        if (error) return alert("Lỗi tạo tài khoản: " + error.message);
-
-        if (data.user) {
-          await supabase.from("profiles").upsert({
-            id: data.user.id,
-            full_name: fullName,
-            role: targetRole,
-            grade_id: selectedGrade,
-            class_name: targetRole === "admin" ? "Giáo viên" : className
-          });
-          setUser({
-            id: data.user.id,
-            email,
-            full_name: fullName,
-            role: targetRole,
-            class_name: targetRole === "admin" ? "Giáo viên" : className
-          });
-          if (targetRole === "admin") setMode("admin");
-          setAuthModal(false);
-        }
-      }
-
-      async function handleLogout() {
-        await supabase.auth.signOut();
-        setUser(null);
-        if (mode === "admin") setMode("lookup");
-      }
-
-      async function handleAddGrade(e) {
-        e.preventDefault();
-        if (!isAdmin) return;
-        const payload = { id: newGradeId.trim(), name: newGradeName.trim(), description: "Chương trình Hóa học", is_active: true };
-        const { error } = await supabase.from("grades").insert(payload);
-        if (error) return alert("Lỗi thêm khối: " + error.message);
-        setGrades([...grades, payload]);
-        setNewGradeId("");
-        setNewGradeName("");
-        alert("Đã mở thêm khối lớp mới!");
-      }
-
-      function handleContentChange(val) {
-        const { extractedCode, cleanContent } = extractLeadingCode(val);
-        if (extractedCode && !newQ.question_code) {
-          setNewQ({ ...newQ, question_code: extractedCode, content: cleanContent });
-        } else {
-          setNewQ({ ...newQ, content: val });
-        }
-      }
-
-      async function handleAddQuestion(e) {
-        e.preventDefault();
-        if (!isAdmin) return alert("Chỉ tài khoản Giáo viên mới có quyền thêm câu hỏi!");
-
-        const opts = newQ.type === "mcq" || newQ.type === "true_false"
-          ? [newQ.optA, newQ.optB, newQ.optC, newQ.optD].filter(Boolean)
-          : [];
-        const corr = newQ.type === "true_false"
-          ? newQ.correct_answer.split(",").map((s) => s.trim())
-          : newQ.correct_answer;
-
-        const hintsArr = [newQ.hint1, newQ.hint2].filter((h) => h && h.trim() !== "");
-        const cleanCode = newQ.question_code.trim().toUpperCase();
-
-        if (!cleanCode) {
-          alert("Thầy vui lòng nhập Mã câu hỏi (VD: 9KL-06) để học sinh tra cứu chính xác!");
-          return;
-        }
-
-        const payload = {
-          question_code: cleanCode,
-          grade_id: newQ.grade_id,
-          chapter: newQ.chapter,
-          type: newQ.type,
-          content: newQ.content,
-          options: opts,
-          correct_answer: corr,
-          hints: hintsArr,
-          explanation: newQ.explanation,
-          search_index: normalizeText(cleanCode + " " + newQ.chapter + " " + newQ.content + " " + opts.join(" "))
-        };
-
-        const { data, error } = await supabase.from("questions").insert(payload).select();
-        if (error) {
-          alert("Lỗi lưu lên Supabase: " + error.message);
-        } else if (data) {
-          setQuestions([data[0], ...questions]);
-          alert("Đã lưu thành công câu hỏi có Mã: [" + cleanCode + "]!");
-          setNewQ({
-            ...newQ,
-            question_code: "",
-            content: "",
-            optA: "", optB: "", optC: "", optD: "",
-            correct_answer: "",
-            hint1: "",
-            hint2: "",
-            explanation: ""
-          });
-        }
-      }
-
-      async function handleBulkImport(e) {
-        e.preventDefault();
-        if (!isAdmin) return;
-        const lines = bulkText.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
-        if (lines.length === 0) return;
-
-        const rowsToInsert = [];
-        for (const line of lines) {
-          const parts = line.split("|").map((p) => p.trim());
-          if (parts.length < 3) continue;
-          const code = parts[0];
-          const content = parts[1];
-          const ans = parts[2];
-          const hint = parts[3] || "";
-          const exp = parts[4] || "";
-          const cleanCode = code.toUpperCase();
-          rowsToInsert.push({
-            question_code: cleanCode,
-            grade_id: bulkGradeId,
-            chapter: bulkChapter,
-            type: "short_answer",
-            content: content,
-            options: [],
-            correct_answer: ans,
-            hints: hint ? [hint] : [],
-            explanation: exp || ("Đáp án chuẩn: " + ans),
-            search_index: normalizeText(cleanCode + " " + bulkChapter + " " + content)
-          });
-        }
-
-        if (rowsToInsert.length === 0) {
-          alert("Chưa đúng định dạng! Mỗi dòng cần có ít nhất: MÃ | ĐỀ BÀI | ĐÁP ÁN");
-          return;
-        }
-
-        const { data, error } = await supabase.from("questions").insert(rowsToInsert).select();
-        if (error) {
-          alert("Lỗi nhập hàng loạt: " + error.message);
-        } else if (data) {
-          setQuestions([...data, ...questions]);
-          setBulkText("");
-          alert("Đã nạp thành công " + data.length + " câu hỏi kèm Mã tra cứu lên hệ thống!");
-        }
-      }
-
-      async function handleDeleteQuestion(id) {
-        if (!isAdmin || !confirm("Thầy chắc chắn muốn xóa câu hỏi này?")) return;
-        await supabase.from("questions").delete().eq("id", id);
-        setQuestions(questions.filter((q) => q.id !== id));
-      }
-
-      const gradeQuestions = useMemo(
-        () => questions.filter((q) => q.grade_id === selectedGrade),
-        [questions, selectedGrade]
-      );
-
-      const chapters = useMemo(() => {
-        const sourceList = searchAllGrades && searchQuery.trim() ? questions : gradeQuestions;
-        const set = new Set(sourceList.map((q) => q.chapter));
-        return ["ALL", ...Array.from(set)];
-      }, [questions, gradeQuestions, searchAllGrades, searchQuery]);
-
-      const combinedSearchResults = useMemo(() => {
-        const rawTrim = searchQuery.trim();
-        const normCodeQuery = normalizeCode(rawTrim);
-        const normTextQuery = normalizeText(rawTrim);
-
-        const pool = (rawTrim && searchAllGrades) ? questions : gradeQuestions;
-
-        return pool
-          .filter((q) => chapterFilter === "ALL" || q.chapter === chapterFilter)
-          .map((q) => {
-            if (!rawTrim) return { ...q, matchType: "default", priority: 0 };
-
-            const qCode = normalizeCode(q.question_code);
-
-            if (qCode && qCode === normCodeQuery) {
-              return { ...q, matchType: "exact_code", priority: 100 };
-            }
-
-            if (qCode && normCodeQuery.length >= 2 && qCode.includes(normCodeQuery)) {
-              return { ...q, matchType: "partial_code", priority: 80 };
-            }
-
-            const tokens = normTextQuery.split(" ").filter((t) => t.length > 0);
-            if (tokens.length === 0) return { ...q, matchType: "none", priority: -1 };
-
-            const haystack = normalizeText(
-              (q.question_code || "") + " " + q.chapter + " " + q.content + " " + (q.options || []).join(" ")
-            );
-
-            let matched = 0;
-            tokens.forEach((t) => {
-              if (haystack.includes(t)) matched++;
-            });
-
-            const ratio = matched / tokens.length;
-            if (ratio >= 0.5) {
-              return {
-                ...q,
-                matchType: "keyword",
-                matchPercent: Math.round(ratio * 100),
-                priority: Math.round(ratio * 60)
-              };
-            }
-
-            return { ...q, matchType: "none", priority: -1 };
-          })
-          .filter((q) => q.priority >= 0)
-          .sort((a, b) => b.priority - a.priority);
-      }, [questions, gradeQuestions, searchQuery, chapterFilter, searchAllGrades]);
-
-      const calculateScore = () => {
-        let total = 0;
-        gradeQuestions.forEach((q) => {
-          const ans = answers[q.id];
-          if (!ans) return;
-          if (q.type === "true_false" && Array.isArray(q.correct_answer)) {
-            let match = 0;
-            q.correct_answer.forEach((val, idx) => {
-              if (ans[idx] === val) match++;
-            });
-            const mapScore = [0, 0.1, 0.25, 0.5, 1.0];
-            total += mapScore[match] || 0;
-          } else if (q.type !== "essay") {
-            const normUser = normalizeText(String(ans)).replace(",", ".");
-            const normCorr = normalizeText(String(q.correct_answer)).replace(",", ".");
-            if (normUser === normCorr) total += 1;
-          }
-        });
-        return total.toFixed(2);
-      };
-
-      const formatTime = (sec) => {
-        const m = Math.floor(sec / 60);
-        const s = sec % 60;
-        return m + ":" + (s < 10 ? "0" : "") + s;
-      };
-
-      return (
-        <div className="min-h-screen flex flex-col">
-          <header className="bg-teal-800 text-white shadow-md">
-            <div className="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="bg-amber-400 text-teal-950 font-extrabold px-3 py-1.5 rounded-lg text-lg">H₂O</div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h1 className="font-bold text-lg leading-tight">HÓA HỌC THẦY CHIẾN</h1>
-                    <span className="text-[11px] bg-teal-950 text-amber-300 font-mono px-2 py-0.5 rounded">v4.2</span>
-                  </div>
-                  <p className="text-xs text-teal-200">Tra cứu theo Mã câu hỏi & Từ khóa • Luyện tập • Kiểm tra</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 flex-wrap">
-                {grades.map((g) => (
-                  <button
-                    key={g.id}
-                    onClick={() => { setSelectedGrade(g.id); setChapterFilter("ALL"); setExamSubmitted(false); }}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition ${
-                      selectedGrade === g.id ? "bg-amber-400 text-slate-900" : "bg-teal-700 hover:bg-teal-600"
-                    }`}
-                  >
-                    {g.name}
-                  </button>
-                ))}
-
-                {user ? (
-                  <div className="flex items-center gap-2 ml-2 bg-teal-900 border border-teal-600 px-3 py-1.5 rounded-lg text-sm">
-                    <span className="font-semibold">
-                      {isAdmin ? "🛡️ GV: " : "🎓 HS: "}
-                      {user.full_name}
-                      {user.class_name && !isAdmin ? " (" + user.class_name + ")" : ""}
-                    </span>
-                    <button onClick={handleLogout} className="text-xs underline text-amber-300 ml-1">Thoát</button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => { setAuthTab("login"); setAuthModal(true); }}
-                    className="ml-2 bg-white text-teal-900 font-bold px-3.5 py-1.5 rounded-lg text-sm hover:bg-teal-50 shadow-sm"
-                  >
-                    Đăng nhập
-                  </button>
-                )}
-              </div>
-            </div>
-          </header>
-
-          <nav className="bg-white border-b border-slate-200 sticky top-0 z-10">
-            <div className="max-w-6xl mx-auto px-4 flex overflow-x-auto gap-2 py-2.5">
-              {[
-                { id: "lookup", label: "🔍 1. Tra cứu Mã câu & Đề bài" },
-                { id: "practice", label: "🎯 2. Luyện tập chuyên đề" },
-                { id: "exam", label: "⏱️ 3. Kiểm tra / Thi thử" },
-                ...(isAdmin ? [{ id: "admin", label: "🛡️ Quản trị Giáo viên (Nhập Mã & Đề)" }] : [])
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setMode(tab.id)}
-                  className={`px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition ${
-                    mode === tab.id
-                      ? tab.id === "admin"
-                        ? "bg-amber-600 text-white shadow-sm"
-                        : "bg-teal-700 text-white shadow-sm"
-                      : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-          </nav>
-
-          <main className="max-w-5xl w-full mx-auto px-4 py-6 flex-1">
-            {mode === "lookup" && (
-              <div className="space-y-4">
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-3">
-                  <div className="flex flex-wrap justify-between items-center gap-2">
-                    <h2 className="font-bold text-lg text-slate-800">
-                      Tra cứu hướng dẫn giải & Đáp án
-                    </h2>
-                    <label className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={searchAllGrades}
-                        onChange={(e) => setSearchAllGrades(e.target.checked)}
-                        className="rounded text-teal-600"
-                      />
-                      Tìm mã câu hỏi trên tất cả các khối lớp
-                    </label>
-                  </div>
-
-                  <div className="grid sm:grid-cols-3 gap-3">
-                    <div className="sm:col-span-2 relative">
-                      <input
-                        type="text"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Nhập MÃ CÂU HỎI (VD: 9KL-01, 10NT-01) hoặc gõ từ khóa đề bài..."
-                        className="w-full border-2 border-teal-600/40 rounded-lg px-4 py-2.5 focus:outline-none focus:border-teal-600 font-medium"
-                      />
-                      {searchQuery && (
-                        <button
-                          onClick={() => setSearchQuery("")}
-                          className="absolute right-3 top-3 text-xs text-slate-400 hover:text-slate-700"
-                        >
-                          Xóa
-                        </button>
-                      )}
-                    </div>
-                    <select
-                      value={chapterFilter}
-                      onChange={(e) => setChapterFilter(e.target.value)}
-                      className="border border-slate-300 rounded-lg px-3 py-2.5 text-sm bg-white"
-                    >
-                      {chapters.map((ch) => (
-                        <option key={ch} value={ch}>
-                          {ch === "ALL" ? "Tất cả chuyên đề" : ch}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 pt-1">
-                    <span>Thử tra nhanh theo mã:</span>
-                    {["9KL-01", "9HC-02", "9KL-05", "10NT-01"].map((sampleCode) => (
-                      <button
-                        key={sampleCode}
-                        type="button"
-                        onClick={() => setSearchQuery(sampleCode)}
-                        className="px-2 py-0.5 bg-slate-100 hover:bg-teal-100 text-teal-800 font-mono font-bold rounded border border-slate-300"
-                      >
-                        {sampleCode}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {combinedSearchResults.length === 0 ? (
-                  <div className="bg-white p-8 rounded-xl border border-slate-200 text-center space-y-2">
-                    <p className="text-slate-600 font-medium">Không tìm thấy câu hỏi nào khớp với "{searchQuery}".</p>
-                    <p className="text-xs text-slate-400">Em hãy kiểm tra lại Mã câu hỏi in ở đầu đề bài (VD: 9KL-01) hoặc nhập 2-3 từ khóa ngắn gọn trong đề nhé.</p>
-                  </div>
-                ) : (
-                  combinedSearchResults.map((q, idx) => (
-                    <div
-                      key={q.id}
-                      className={`bg-white p-5 rounded-xl shadow-sm border space-y-3 ${
-                        q.matchType === "exact_code" ? "border-2 border-teal-600 ring-2 ring-teal-100" : "border-slate-200"
-                      }`}
-                    >
-                      <div className="flex flex-wrap justify-between items-center gap-2 text-xs">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          {q.question_code && (
-                            <span className="bg-teal-700 text-white font-mono font-bold px-2.5 py-1 rounded">
-                              Mã: {q.question_code}
-                            </span>
-                          )}
-                          <span className="bg-slate-100 text-slate-700 font-semibold px-2.5 py-1 rounded">
-                            Khối {q.grade_id} • {q.chapter}
-                          </span>
-                          {q.matchType === "exact_code" && (
-                            <span className="bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded">
-                              ✓ Khớp chính xác Mã câu hỏi
-                            </span>
-                          )}
-                          {q.matchType === "keyword" && (
-                            <span className="bg-sky-50 text-sky-700 font-medium px-2 py-0.5 rounded">
-                              Khớp {q.matchPercent}% từ khóa
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-slate-400">👁️ {q.search_count || 0} lượt xem</span>
-                      </div>
-
-                      <p className="font-medium text-slate-900 leading-relaxed">
-                        {q.question_code ? "[" + q.question_code + "] " : "Câu " + (idx + 1) + ": "}
-                        {q.content}
-                      </p>
-
-                      {q.options && q.options.length > 0 && (
-                        <ul className="grid sm:grid-cols-2 gap-2 text-sm text-slate-700 pl-2">
-                          {q.options.map((o, i) => <li key={i}>• {o}</li>)}
-                        </ul>
-                      )}
-
-                      <div className="flex flex-wrap gap-2 pt-2">
-                        <button
-                          onClick={() => setRevealedHints({ ...revealedHints, [q.id]: !revealedHints[q.id] })}
-                          className="px-3.5 py-1.5 text-sm bg-amber-100 text-amber-900 font-semibold rounded-lg hover:bg-amber-200"
-                        >
-                          💡 {revealedHints[q.id] ? "Ẩn gợi ý" : "Gợi ý phương pháp giải"}
-                        </button>
-                        <button
-                          onClick={() => setRevealedSol({ ...revealedSol, [q.id]: !revealedSol[q.id] })}
-                          className="px-3.5 py-1.5 text-sm bg-teal-100 text-teal-900 font-semibold rounded-lg hover:bg-teal-200"
-                        >
-                          📖 {revealedSol[q.id] ? "Ẩn đáp án" : "Xem đáp án & lời giải chi tiết"}
-                        </button>
-                      </div>
-
-                      {revealedHints[q.id] && (
-                        <div className="bg-amber-50 border-l-4 border-amber-400 p-3.5 text-sm text-amber-950 space-y-1.5 rounded-r-lg">
-                          <p className="font-bold text-amber-800">Hướng dẫn tư duy từng bước:</p>
-                          {(q.hints && q.hints.length > 0) ? (
-                            q.hints.map((h, i) => <p key={i}>{h}</p>)
-                          ) : (
-                            <p>Đọc kỹ dữ kiện đề bài, viết phương trình hóa học và tính số mol các chất đã biết.</p>
-                          )}
-                        </div>
-                      )}
-
-                      {revealedSol[q.id] && (
-                        <div className="bg-teal-50 border-l-4 border-teal-600 p-3.5 text-sm text-teal-950 space-y-1.5 rounded-r-lg">
-                          <p className="font-bold text-teal-900 text-base">
-                            Đáp án: {Array.isArray(q.correct_answer) ? q.correct_answer.join(" | ") : q.correct_answer}
-                          </p>
-                          <p className="leading-relaxed whitespace-pre-line">{q.explanation}</p>
-                        </div>
-                      )}
-                    </div>
-                  ))
-                )}
-              </div>
-            )}
-
-            {(mode === "practice" || mode === "exam") && (
-              <div className="space-y-5">
-                <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap justify-between items-center gap-3">
-                  <div>
-                    <h2 className="font-bold text-lg text-slate-800">
-                      {mode === "practice" ? "Chế độ Luyện tập (Kiểm tra đáp án từng câu)" : "Bài kiểm tra tổng hợp (Đủ 5 dạng bài tập)"}
-                    </h2>
-                    <p className="text-sm text-slate-500">Hỗ trợ trắc nghiệm 4 lựa chọn, Đúng/Sai 4 ý, Điền khuyết, Trả lời ngắn và Tự luận.</p>
-                  </div>
-                  {mode === "exam" && (
-                    <div className="flex items-center gap-3">
-                      <span className="bg-rose-100 text-rose-700 font-bold px-3 py-1.5 rounded-lg">⏳ {formatTime(timeLeft)}</span>
-                      {!examSubmitted && (
-                        <button
-                          onClick={() => setExamSubmitted(true)}
-                          className="bg-teal-700 text-white font-bold px-4 py-2 rounded-lg hover:bg-teal-800"
-                        >
-                          Nộp bài
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                {mode === "exam" && examSubmitted && (
-                  <div className="bg-emerald-50 border border-emerald-300 p-5 rounded-xl flex justify-between items-center">
-                    <div>
-                      <h3 className="font-bold text-emerald-900 text-lg">🎉 Đã nộp bài thành công!</h3>
-                      <p className="text-sm text-emerald-800">
-                        Điểm phần tự động chấm: <strong className="text-xl">{calculateScore()}</strong> điểm.
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => { setExamSubmitted(false); setAnswers({}); setTimeLeft(900); }}
-                      className="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-semibold"
-                    >
-                      Làm lại đề
-                    </button>
-                  </div>
-                )}
-
-                {gradeQuestions.map((q, idx) => (
-                  <div key={q.id} className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-3">
-                    <div className="flex justify-between text-xs text-slate-500">
-                      <div className="flex items-center gap-2">
-                        {q.question_code && <span className="font-mono font-bold bg-slate-200 text-slate-800 px-2 py-0.5 rounded">{q.question_code}</span>}
-                        <span className="font-semibold text-teal-700">{q.chapter}</span>
-                      </div>
-                      <span className="uppercase bg-slate-100 px-2 py-0.5 rounded">{q.type}</span>
-                    </div>
-                    <p className="font-medium text-slate-900">Câu {idx + 1}: {q.content}</p>
-
-                    {q.type === "mcq" && (
-                      <div className="grid sm:grid-cols-2 gap-2">
-                        {q.options.map((opt, i) => (
-                          <label key={i} className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer ${answers[q.id] === opt ? "border-teal-600 bg-teal-50" : "border-slate-200"}`}>
-                            <input
-                              type="radio"
-                              name={q.id}
-                              checked={answers[q.id] === opt}
-                              onChange={() => setAnswers({ ...answers, [q.id]: opt })}
-                            />
-                            <span className="text-sm">{opt}</span>
-                          </label>
-                        ))}
-                      </div>
-                    )}
-
-                    {q.type === "true_false" && (
-                      <div className="space-y-2">
-                        {q.options.map((sub, i) => {
-                          const curArr = answers[q.id] || ["", "", "", ""];
-                          return (
-                            <div key={i} className="flex flex-wrap items-center justify-between gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200">
-                              <span className="text-sm flex-1">{sub}</span>
-                              <div className="flex gap-2">
-                                {["Đúng", "Sai"].map((choice) => (
-                                  <button
-                                    key={choice}
-                                    type="button"
-                                    onClick={() => {
-                                      const next = [...curArr];
-                                      next[i] = choice;
-                                      setAnswers({ ...answers, [q.id]: next });
-                                    }}
-                                    className={`px-3 py-1 rounded text-xs font-bold ${
-                                      curArr[i] === choice ? "bg-teal-600 text-white" : "bg-white border border-slate-300 text-slate-600"
-                                    }`}
-                                  >
-                                    {choice}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-
-                    {(q.type === "fill_blank" || q.type === "short_answer") && (
-                      <input
-                        type="text"
-                        value={answers[q.id] || ""}
-                        onChange={(e) => setAnswers({ ...answers, [q.id]: e.target.value })}
-                        placeholder="Nhập câu trả lời ngắn của em..."
-                        className="w-full sm:w-80 border border-slate-300 rounded-lg px-3 py-2 text-sm"
-                      />
-                    )}
-
-                    {q.type === "essay" && (
-                      <textarea
-                        rows="3"
-                        value={answers[q.id] || ""}
-                        onChange={(e) => setAnswers({ ...answers, [q.id]: e.target.value })}
-                        placeholder="Trình bày lời giải chi tiết hoặc dán link ảnh bài làm..."
-                        className="w-full border border-slate-300 rounded-lg p-3 text-sm"
-                      />
-                    )}
-
-                    {mode === "practice" && (
-                      <div className="pt-2">
-                        <button
-                          onClick={() => setCheckedPractice({ ...checkedPractice, [q.id]: true })}
-                          className="bg-teal-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-teal-700"
-                        >
-                          Kiểm tra câu này
-                        </button>
-                      </div>
-                    )}
-
-                    {((mode === "practice" && checkedPractice[q.id]) || (mode === "exam" && examSubmitted)) && (
-                      <div className="bg-slate-100 p-3 rounded-lg text-sm space-y-1 border-l-4 border-teal-600">
-                        <p className="font-bold text-teal-800">Đáp án chuẩn: {Array.isArray(q.correct_answer) ? q.correct_answer.join(" | ") : q.correct_answer}</p>
-                        <p className="text-slate-700">{q.explanation}</p>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {mode === "admin" && isAdmin && (
-              <div className="space-y-6">
-                <div className="flex flex-wrap gap-2 bg-amber-50 p-3 rounded-xl border border-amber-200">
-                  <button
-                    onClick={() => setAdminSubTab("single")}
-                    className={`px-4 py-2 rounded-lg text-sm font-bold ${adminSubTab === "single" ? "bg-teal-700 text-white" : "bg-white text-slate-700 border"}`}
-                  >
-                    ✍️ Nhập từng câu (Kèm Mã câu hỏi)
-                  </button>
-                  <button
-                    onClick={() => setAdminSubTab("bulk")}
-                    className={`px-4 py-2 rounded-lg text-sm font-bold ${adminSubTab === "bulk" ? "bg-teal-700 text-white" : "bg-white text-slate-700 border"}`}
-                  >
-                    ⚡ Nhập hàng loạt nhiều câu có sẵn Mã
-                  </button>
-                  <button
-                    onClick={() => setAdminSubTab("grades")}
-                    className={`px-4 py-2 rounded-lg text-sm font-bold ${adminSubTab === "grades" ? "bg-amber-600 text-white" : "bg-white text-slate-700 border"}`}
-                  >
-                    📚 Mở rộng Khối lớp
-                  </button>
-                </div>
-
-                {adminSubTab === "single" && (
-                  <div className="bg-white p-6 rounded-xl shadow-sm border-2 border-teal-600/30 space-y-4">
-                    <div className="border-b pb-3">
-                      <h2 className="font-bold text-lg text-teal-800">Thêm câu hỏi mới & Gắn Mã tra cứu</h2>
-                      <p className="text-xs text-slate-500">Mẹo: Nếu thầy dán đề có dạng <code className="bg-slate-100 px-1 rounded">[9KL-06] Nội dung câu hỏi...</code> vào ô đề bài, hệ thống sẽ tự bóc tách <strong>9KL-06</strong> điền vào ô Mã câu hỏi.</p>
-                    </div>
-
-                    <form onSubmit={handleAddQuestion} className="space-y-4">
-                      <div className="bg-teal-50/70 p-4 rounded-xl border border-teal-200 grid sm:grid-cols-4 gap-3">
-                        <div>
-                          <label className="block text-xs font-extrabold text-teal-900 uppercase mb-1">
-                            🔑 Mã câu hỏi (Bắt buộc)
-                          </label>
-                          <input
-                            required
-                            placeholder="VD: 9KL-06"
-                            value={newQ.question_code}
-                            onChange={(e) => setNewQ({ ...newQ, question_code: e.target.value })}
-                            className="w-full border-2 border-teal-600 bg-white rounded-lg p-2 text-sm font-mono font-bold uppercase text-teal-950"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold mb-1">Khối lớp</label>
-                          <select
-                            value={newQ.grade_id}
-                            onChange={(e) => setNewQ({ ...newQ, grade_id: e.target.value })}
-                            className="w-full border rounded-lg p-2 text-sm bg-white"
-                          >
-                            {grades.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
-                          </select>
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold mb-1">Chương / Chủ đề</label>
-                          <input
-                            required
-                            value={newQ.chapter}
-                            onChange={(e) => setNewQ({ ...newQ, chapter: e.target.value })}
-                            className="w-full border rounded-lg p-2 text-sm bg-white"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold mb-1">Dạng câu hỏi</label>
-                          <select
-                            value={newQ.type}
-                            onChange={(e) => setNewQ({ ...newQ, type: e.target.value })}
-                            className="w-full border rounded-lg p-2 text-sm bg-white"
-                          >
-                            <option value="mcq">Trắc nghiệm nhiều lựa chọn</option>
-                            <option value="true_false">Trắc nghiệm Đúng/Sai (4 ý)</option>
-                            <option value="fill_blank">Điền khuyết</option>
-                            <option value="short_answer">Trả lời ngắn</option>
-                            <option value="essay">Tự luận</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-semibold mb-1">Nội dung câu hỏi</label>
-                        <textarea
-                          required
-                          rows="2"
-                          value={newQ.content}
-                          onChange={(e) => handleContentChange(e.target.value)}
-                          className="w-full border rounded-lg p-2.5 text-sm"
-                          placeholder="Nhập hoặc dán nội dung đề bài (có thể dán kèm [MÃ] ở đầu)..."
-                        />
-                      </div>
-
-                      {(newQ.type === "mcq" || newQ.type === "true_false") && (
-                        <div className="grid sm:grid-cols-2 gap-2">
-                          <input placeholder="Lựa chọn A / Ý a)" value={newQ.optA} onChange={(e) => setNewQ({ ...newQ, optA: e.target.value })} className="border rounded-lg p-2 text-sm" />
-                          <input placeholder="Lựa chọn B / Ý b)" value={newQ.optB} onChange={(e) => setNewQ({ ...newQ, optB: e.target.value })} className="border rounded-lg p-2 text-sm" />
-                          <input placeholder="Lựa chọn C / Ý c)" value={newQ.optC} onChange={(e) => setNewQ({ ...newQ, optC: e.target.value })} className="border rounded-lg p-2 text-sm" />
-                          <input placeholder="Lựa chọn D / Ý d)" value={newQ.optD} onChange={(e) => setNewQ({ ...newQ, optD: e.target.value })} className="border rounded-lg p-2 text-sm" />
-                        </div>
-                      )}
-
-                      <div className="grid sm:grid-cols-3 gap-3">
-                        <div>
-                          <label className="block text-xs font-semibold mb-1">Đáp án chuẩn</label>
-                          <input
-                            required
-                            placeholder="VD: Iron (Fe) hoặc Đúng, Sai, Đúng, Sai"
-                            value={newQ.correct_answer}
-                            onChange={(e) => setNewQ({ ...newQ, correct_answer: e.target.value })}
-                            className="w-full border rounded-lg p-2 text-sm"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold mb-1">Gợi ý bước 1 (Tra cứu)</label>
-                          <input
-                            placeholder="VD: Tính số mol chất tham gia..."
-                            value={newQ.hint1}
-                            onChange={(e) => setNewQ({ ...newQ, hint1: e.target.value })}
-                            className="w-full border rounded-lg p-2 text-sm"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold mb-1">Gợi ý bước 2 (Tùy chọn)</label>
-                          <input
-                            placeholder="VD: Áp dụng V = n × 24,79..."
-                            value={newQ.hint2}
-                            onChange={(e) => setNewQ({ ...newQ, hint2: e.target.value })}
-                            className="w-full border rounded-lg p-2 text-sm"
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-semibold mb-1">Lời giải chi tiết</label>
-                        <textarea
-                          rows="2"
-                          value={newQ.explanation}
-                          onChange={(e) => setNewQ({ ...newQ, explanation: e.target.value })}
-                          className="w-full border rounded-lg p-2.5 text-sm"
-                          placeholder="Trình bày lời giải chi tiết để học sinh đối chiếu khi tra mã..."
-                        />
-                      </div>
-
-                      <button type="submit" className="bg-teal-700 text-white font-bold px-5 py-2.5 rounded-lg hover:bg-teal-800 shadow-sm">
-                        + Lưu câu hỏi & Mã [{newQ.question_code ? newQ.question_code.toUpperCase() : "..."}] lên hệ thống
-                      </button>
-                    </form>
-                  </div>
-                )}
-
-                {adminSubTab === "bulk" && (
-                  <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
-                    <div>
-                      <h2 className="font-bold text-lg text-teal-800">Nhập nhanh hàng loạt câu hỏi có sẵn Mã</h2>
-                      <p className="text-xs text-slate-600 mt-1">
-                        Mỗi câu nhập trên 1 dòng theo cấu trúc ngăn cách bởi dấu gạch đứng <code className="bg-slate-100 px-1.5 py-0.5 rounded font-bold">|</code>:
-                        <br />
-                        <span className="font-mono text-teal-800">MÃ CÂU HỎI | NỘI DUNG ĐỀ BÀI | ĐÁP ÁN | GỢI Ý (tùy chọn) | LỜI GIẢI CHI TIẾT (tùy chọn)</span>
-                      </p>
-                    </div>
-
-                    <form onSubmit={handleBulkImport} className="space-y-3">
-                      <div className="grid sm:grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-xs font-semibold mb-1">Áp dụng cho Khối lớp</label>
-                          <select
-                            value={bulkGradeId}
-                            onChange={(e) => setBulkGradeId(e.target.value)}
-                            className="w-full border rounded-lg p-2 text-sm"
-                          >
-                            {grades.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
-                          </select>
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold mb-1">Áp dụng cho Chương / Chủ đề</label>
-                          <input
-                            required
-                            value={bulkChapter}
-                            onChange={(e) => setBulkChapter(e.target.value)}
-                            className="w-full border rounded-lg p-2 text-sm"
-                          />
-                        </div>
-                      </div>
-
-                      <textarea
-                        required
-                        rows="6"
-                        value={bulkText}
-                        onChange={(e) => setBulkText(e.target.value)}
-                        placeholder={"Ví dụ:\n9KL-10 | Hòa tan 2,4g Mg vào HCl dư thu được bao nhiêu lít H2 (đkc)? | 2,479 L | Tính n(Mg) = 2,4/24 = 0,1 mol | Mg + 2HCl -> MgCl2 + H2 => V = 0,1 x 24,79 = 2,479 L"}
-                        className="w-full border rounded-lg p-3 text-sm font-mono"
-                      />
-
-                      <button type="submit" className="bg-teal-700 text-white font-bold px-5 py-2.5 rounded-lg hover:bg-teal-800">
-                        ⚡ Nạp toàn bộ danh sách câu hỏi lên hệ thống
-                      </button>
-                    </form>
-                  </div>
-                )}
-
-                {adminSubTab === "grades" && (
-                  <div className="bg-white p-5 rounded-xl shadow-sm border border-amber-200">
-                    <h2 className="font-bold text-base text-amber-900 mb-3">Quản lý & Mở rộng Khối lớp</h2>
-                    <form onSubmit={handleAddGrade} className="flex flex-wrap gap-3">
-                      <input
-                        required
-                        placeholder="Mã khối (VD: 8, 11, ONTHI)"
-                        value={newGradeId}
-                        onChange={(e) => setNewGradeId(e.target.value)}
-                        className="border rounded-lg px-3 py-2 text-sm"
-                      />
-                      <input
-                        required
-                        placeholder="Tên hiển thị (VD: Khối 8, Ôn thi vào 10)"
-                        value={newGradeName}
-                        onChange={(e) => setNewGradeName(e.target.value)}
-                        className="border rounded-lg px-3 py-2 text-sm flex-1"
-                      />
-                      <button type="submit" className="bg-amber-600 text-white font-semibold px-4 py-2 rounded-lg text-sm hover:bg-amber-700">
-                        + Thêm khối lớp
-                      </button>
-                    </form>
-                  </div>
-                )}
-
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-3">
-                  <h2 className="font-bold text-lg text-slate-800">Danh sách câu hỏi & Mã đã lưu ({questions.length} câu)</h2>
-                  {questions.map((q) => (
-                    <div key={q.id} className="flex justify-between items-start gap-3 p-3 border rounded-lg text-sm">
-                      <div>
-                        <span className="font-mono font-bold bg-teal-700 text-white px-2 py-0.5 rounded mr-2">
-                          {q.question_code || "CHƯA CÓ MÃ"}
-                        </span>
-                        <span className="text-xs font-bold text-slate-500">[Khối {q.grade_id} - {q.chapter}] </span>
-                        <span>{q.content}</span>
-                      </div>
-                      <button
-                        onClick={() => handleDeleteQuestion(q.id)}
-                        className="text-xs text-rose-600 hover:underline font-semibold shrink-0"
-                      >
-                        Xóa
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </main>
-
-          {authModal && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-              <div className="bg-white rounded-xl max-w-md w-full p-6 space-y-4">
-                <div className="flex justify-between items-center border-b pb-3">
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setAuthTab("login")}
-                      className={`text-xs font-bold px-2.5 py-1.5 rounded ${authTab === "login" ? "bg-teal-700 text-white" : "bg-slate-100"}`}
-                    >
-                      Đăng nhập
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setAuthTab("register_student")}
-                      className={`text-xs font-bold px-2.5 py-1.5 rounded ${authTab === "register_student" ? "bg-teal-700 text-white" : "bg-slate-100"}`}
-                    >
-                      ĐK Học sinh
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setAuthTab("register_admin")}
-                      className={`text-xs font-bold px-2.5 py-1.5 rounded ${authTab === "register_admin" ? "bg-amber-600 text-white" : "bg-slate-100"}`}
-                    >
-                      ĐK Giáo viên
-                    </button>
-                  </div>
-                  <button onClick={() => setAuthModal(false)} className="text-slate-400 hover:text-slate-600">✕</button>
-                </div>
-
-                <form onSubmit={handleAuth} className="space-y-3">
-                  {authTab !== "login" && (
-                    <>
-                      <input
-                        required
-                        placeholder={authTab === "register_admin" ? "Họ tên Giáo viên (VD: Thầy Chiến)" : "Họ và tên học sinh"}
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                        className="w-full border rounded-lg p-2.5 text-sm"
-                      />
-                      {authTab === "register_student" ? (
-                        <div className="grid grid-cols-2 gap-2">
-                          <input required placeholder="Lớp (VD: 9D, 10A1)" value={className} onChange={(e) => setClassName(e.target.value)} className="border rounded-lg p-2.5 text-sm" />
-                          <input required placeholder="Mã lớp (THAYCHIEN)" value={secretCode} onChange={(e) => setSecretCode(e.target.value)} className="border rounded-lg p-2.5 text-sm" />
-                        </div>
-                      ) : (
-                        <input
-                          required
-                          type="password"
-                          placeholder="Mã bí mật Giáo viên (ADMIN_THAYCHIEN)"
-                          value={secretCode}
-                          onChange={(e) => setSecretCode(e.target.value)}
-                          className="w-full border border-amber-400 rounded-lg p-2.5 text-sm"
-                        />
-                      )}
-                    </>
-                  )}
-                  <input required type="email" placeholder="Email đăng nhập" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full border rounded-lg p-2.5 text-sm" />
-                  <input required type="password" placeholder="Mật khẩu (tối thiểu 6 ký tự)" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full border rounded-lg p-2.5 text-sm" />
-                  <button
-                    type="submit"
-                    className={`w-full text-white font-bold py-2.5 rounded-lg ${authTab === "register_admin" ? "bg-amber-600 hover:bg-amber-700" : "bg-teal-700 hover:bg-teal-800"}`}
-                  >
-                    {authTab === "login" ? "Đăng nhập hệ thống" : authTab === "register_admin" ? "Tạo tài khoản Quản trị" : "Tạo tài khoản Học sinh"}
-                  </button>
-                </form>
-              </div>
-            </div>
-          )}
-        </div>
-      );
+      ],
+      selectedGrade: "9",
+      mode: "lookup",
+      questions: [...SAMPLE_QUESTIONS],
+      searchQuery: "",
+      chapterFilter: "ALL",
+      searchAllGrades: true,
+      revealedHints: {},
+      revealedSol: {},
+      answers: {},
+      checkedPractice: {},
+      examSubmitted: false,
+      timeLeft: 900,
+      timerInterval: null,
+      adminSubTab: "single"
+    };
+
+    // Hàm tiện ích chuẩn hóa văn bản & mã câu hỏi
+    function esc(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
     }
 
-    const root = ReactDOM.createRoot(document.getElementById("root"));
-    root.render(<App />);
+    function normalizeText(str) {
+      if (!str) return "";
+      const subMap = { "₀":"0","₁":"1","₂":"2","₃":"3","₄":"4","₅":"5","₆":"6","₇":"7","₈":"8","₉":"9" };
+      return String(str)
+        .toLowerCase()
+        .replace(/[₀-₉]/g, (m) => subMap[m] || m)
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/đ/g, "d")
+        .replace(/[^a-z0-9\s.,-]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function normalizeCode(code) {
+      return String(code || "").toLowerCase().replace(/[^a-z0-9-]/g, "").trim();
+    }
+
+    function isAdmin() {
+      return state.user && state.user.role === "admin";
+    }
+
+    // Khởi tạo ứng dụng
+    async function initApp() {
+      renderAll();
+      try {
+        const { data: sessData } = await db.auth.getSession();
+        if (sessData && sessData.session && sessData.session.user) {
+          await loadUserProfile(sessData.session.user);
+        }
+      } catch (e) { console.log(e); }
+
+      try {
+        const { data: gData } = await db.from("grades").select("*").eq("is_active", true);
+        if (gData && gData.length > 0) state.grades = gData;
+
+        const { data: qData } = await db.from("questions").select("*").order("created_at", { ascending: false });
+        if (qData && qData.length > 0) state.questions = qData;
+      } catch (e) { console.log(e); }
+
+      renderAll();
+    }
+
+    async function loadUserProfile(authUser) {
+      const { data: profile } = await db.from("profiles").select("*").eq("id", authUser.id).single();
+      if (profile) {
+        state.user = {
+          id: authUser.id,
+          email: authUser.email,
+          full_name: profile.full_name,
+          role: profile.role || "student",
+          class_name: profile.class_name
+        };
+      } else {
+        state.user = {
+          id: authUser.id,
+          email: authUser.email,
+          full_name: authUser.email.split("@")[0],
+          role: "student"
+        };
+      }
+    }
+
+    // Xử lý đăng nhập / đăng ký
+    function openAuthModal() {
+      document.getElementById("auth-modal").classList.remove("hidden");
+      switchAuthTab("login");
+    }
+
+    function closeAuthModal() {
+      document.getElementById("auth-modal").classList.add("hidden");
+    }
+
+    function switchAuthTab(tab) {
+      state.authTab = tab;
+      ["login", "register_student", "register_admin"].forEach((t) => {
+        const btn = document.getElementById("tab-" + t);
+        if (t === tab) {
+          btn.className = t === "register_admin"
+            ? "text-xs font-bold px-2.5 py-1.5 rounded bg-amber-600 text-white"
+            : "text-xs font-bold px-2.5 py-1.5 rounded bg-teal-700 text-white";
+        } else {
+          btn.className = "text-xs font-bold px-2.5 py-1.5 rounded bg-slate-100 text-slate-700";
+        }
+      });
+
+      const regFields = document.getElementById("register-fields");
+      const stuExtra = document.getElementById("student-extra");
+      const admExtra = document.getElementById("admin-extra");
+      const submitBtn = document.getElementById("auth-submit-btn");
+
+      if (tab === "login") {
+        regFields.classList.add("hidden");
+        submitBtn.textContent = "Đăng nhập hệ thống";
+        submitBtn.className = "w-full bg-teal-700 hover:bg-teal-800 text-white font-bold py-2.5 rounded-lg";
+      } else if (tab === "register_student") {
+        regFields.classList.remove("hidden");
+        stuExtra.classList.remove("hidden");
+        admExtra.classList.add("hidden");
+        submitBtn.textContent = "Tạo tài khoản Học sinh";
+        submitBtn.className = "w-full bg-teal-700 hover:bg-teal-800 text-white font-bold py-2.5 rounded-lg";
+      } else {
+        regFields.classList.remove("hidden");
+        stuExtra.classList.add("hidden");
+        admExtra.classList.remove("hidden");
+        submitBtn.textContent = "Tạo tài khoản Quản trị Giáo viên";
+        submitBtn.className = "w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-lg";
+      }
+    }
+
+    async function handleAuthSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById("auth-email").value.trim();
+      const password = document.getElementById("auth-password").value;
+
+      if (state.authTab === "login") {
+        const { data, error } = await db.auth.signInWithPassword({ email, password });
+        if (error) return alert("Đăng nhập thất bại: " + error.message);
+        await loadUserProfile(data.user);
+        closeAuthModal();
+        renderAll();
+        return;
+      }
+
+      const fullName = document.getElementById("auth-fullname").value.trim();
+      if (!fullName) return alert("Vui lòng nhập họ và tên!");
+
+      const targetRole = state.authTab === "register_admin" ? "admin" : "student";
+      const codeInput = targetRole === "admin"
+        ? document.getElementById("auth-admin-code").value.trim().toUpperCase()
+        : document.getElementById("auth-student-code").value.trim().toUpperCase();
+      const expectedCode = targetRole === "admin" ? TEACHER_ADMIN_CODE : STUDENT_CLASS_CODE;
+
+      if (codeInput !== expectedCode) {
+        return alert(targetRole === "admin" ? "Mã bí mật Giáo viên chưa đúng!" : "Mã lớp chưa đúng!");
+      }
+
+      const className = targetRole === "admin" ? "Giáo viên" : document.getElementById("auth-classname").value.trim();
+      const { data, error } = await db.auth.signUp({ email, password });
+      if (error) return alert("Lỗi tạo tài khoản: " + error.message);
+
+      if (data.user) {
+        await db.from("profiles").upsert({
+          id: data.user.id,
+          full_name: fullName,
+          role: targetRole,
+          grade_id: state.selectedGrade,
+          class_name: className
+        });
+        state.user = { id: data.user.id, email, full_name: fullName, role: targetRole, class_name: className };
+        if (targetRole === "admin") state.mode = "admin";
+        closeAuthModal();
+        renderAll();
+      }
+    }
+
+    async function handleLogout() {
+      await db.auth.signOut();
+      state.user = null;
+      if (state.mode === "admin") state.mode = "lookup";
+      renderAll();
+    }
+
+    // Điều hướng Khối & Chế độ
+    function selectGrade(id) {
+      state.selectedGrade = id;
+      state.chapterFilter = "ALL";
+      state.examSubmitted = false;
+      renderAll();
+    }
+
+    function selectMode(m) {
+      state.mode = m;
+      if (state.timerInterval) clearInterval(state.timerInterval);
+      if (m === "exam" && !state.examSubmitted) {
+        state.timerInterval = setInterval(() => {
+          if (state.timeLeft > 0) {
+            state.timeLeft--;
+            const el = document.getElementById("exam-timer");
+            if (el) el.textContent = formatTime(state.timeLeft);
+          }
+        }, 1000);
+      }
+      renderAll();
+    }
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return m + ":" + (s < 10 ? "0" : "") + s;
+    }
+
+    // =========================================================================
+    // RENDER GIAO DIỆN CHÍNH
+    // =========================================================================
+    function renderAll() {
+      // 1. Nút chọn Khối lớp
+      document.getElementById("grade-buttons").innerHTML = state.grades.map((g) => `
+        <button onclick="selectGrade('${esc(g.id)}')"
+          class="px-3 py-1.5 rounded-lg text-sm font-semibold transition ${
+            state.selectedGrade === g.id ? "bg-amber-400 text-slate-900" : "bg-teal-700 hover:bg-teal-600 text-white"
+          }">
+          ${esc(g.name)}
+        </button>
+      `).join("");
+
+      // 2. Khu vực Tài khoản
+      const authArea = document.getElementById("auth-area");
+      if (state.user) {
+        authArea.innerHTML = `
+          <div class="flex items-center gap-2 ml-2 bg-teal-900 border border-teal-600 px-3 py-1.5 rounded-lg text-sm">
+            <span class="font-semibold">
+              ${isAdmin() ? "🛡️ GV: " : "🎓 HS: "}${esc(state.user.full_name)}
+              ${state.user.class_name && !isAdmin() ? " (" + esc(state.user.class_name) + ")" : ""}
+            </span>
+            <button onclick="handleLogout()" class="text-xs underline text-amber-300 ml-1">Thoát</button>
+          </div>
+        `;
+      } else {
+        authArea.innerHTML = `
+          <button onclick="openAuthModal()" class="ml-2 bg-white text-teal-900 font-bold px-3.5 py-1.5 rounded-lg text-sm hover:bg-teal-50 shadow-sm">
+            Đăng nhập
+          </button>
+        `;
+      }
+
+      // 3. Thanh điều hướng chế độ
+      const tabs = [
+        { id: "lookup", label: "🔍 1. Tra cứu Mã câu & Đề bài" },
+        { id: "practice", label: "🎯 2. Luyện tập chuyên đề" },
+        { id: "exam", label: "⏱️ 3. Kiểm tra / Thi thử" }
+      ];
+      if (isAdmin()) {
+        tabs.push({ id: "admin", label: "🛡️ Quản trị Giáo viên (Nhập Mã & Đề)" });
+      }
+
+      document.getElementById("nav-tabs").innerHTML = tabs.map((t) => `
+        <button onclick="selectMode('${t.id}')"
+          class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition ${
+            state.mode === t.id
+              ? (t.id === "admin" ? "bg-amber-600 text-white shadow-sm" : "bg-teal-700 text-white shadow-sm")
+              : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+          }">
+          ${t.label}
+        </button>
+      `).join("");
+
+      // 4. Nội dung chính theo chế độ
+      const main = document.getElementById("app-main");
+      if (state.mode === "lookup") main.innerHTML = renderLookupView();
+      else if (state.mode === "practice" || state.mode === "exam") main.innerHTML = renderPracticeOrExamView();
+      else if (state.mode === "admin" && isAdmin()) main.innerHTML = renderAdminView();
+    }
+
+    // =========================================================================
+    // CHẾ ĐỘ 1: TRA CỨU KẾT HỢP MÃ CÂU HỎI & TỪ KHÓA
+    // =========================================================================
+    function updateSearch(val) {
+      state.searchQuery = val;
+      renderLookupResultsOnly();
+    }
+
+    function setQuickCode(code) {
+      state.searchQuery = code;
+      renderAll();
+    }
+
+    function toggleHint(id) {
+      state.revealedHints[id] = !state.revealedHints[id];
+      renderLookupResultsOnly();
+    }
+
+    function toggleSol(id) {
+      state.revealedSol[id] = !state.revealedSol[id];
+      renderLookupResultsOnly();
+    }
+
+    function getFilteredLookupQuestions() {
+      const rawTrim = state.searchQuery.trim();
+      const normCodeQuery = normalizeCode(rawTrim);
+      const normTextQuery = normalizeText(rawTrim);
+
+      const pool = (rawTrim && state.searchAllGrades)
+        ? state.questions
+        : state.questions.filter((q) => q.grade_id === state.selectedGrade);
+
+      return pool
+        .filter((q) => state.chapterFilter === "ALL" || q.chapter === state.chapterFilter)
+        .map((q) => {
+          if (!rawTrim) return { ...q, matchType: "default", priority: 0 };
+          const qCode = normalizeCode(q.question_code);
+
+          if (qCode && qCode === normCodeQuery) return { ...q, matchType: "exact_code", priority: 100 };
+          if (qCode && normCodeQuery.length >= 2 && qCode.includes(normCodeQuery)) return { ...q, matchType: "partial_code", priority: 80 };
+
+          const tokens = normTextQuery.split(" ").filter(Boolean);
+          if (tokens.length === 0) return { ...q, matchType: "none", priority: -1 };
+
+          const haystack = normalizeText(
+            (q.question_code || "") + " " + q.chapter + " " + q.content + " " + (q.options || []).join(" ")
+          );
+          let matched = 0;
+          tokens.forEach((t) => { if (haystack.includes(t)) matched++; });
+
+          const ratio = matched / tokens.length;
+          if (ratio >= 0.5) {
+            return { ...q, matchType: "keyword", matchPercent: Math.round(ratio * 100), priority: Math.round(ratio * 60) };
+          }
+          return { ...q, matchType: "none", priority: -1 };
+        })
+        .filter((q) => q.priority >= 0)
+        .sort((a, b) => b.priority - a.priority);
+    }
+
+    function renderLookupResultsHTML() {
+      const results = getFilteredLookupQuestions();
+      if (results.length === 0) {
+        return `
+          <div class="bg-white p-8 rounded-xl border border-slate-200 text-center space-y-2">
+            <p class="text-slate-600 font-medium">Không tìm thấy câu hỏi nào khớp với "${esc(state.searchQuery)}".</p>
+            <p class="text-xs text-slate-400">Em hãy kiểm tra lại Mã câu hỏi in ở đầu đề bài (VD: 9KL-01) hoặc nhập 2-3 từ khóa ngắn gọn nhé.</p>
+          </div>
+        `;
+      }
+
+      return results.map((q, idx) => {
+        const showH = !!state.revealedHints[q.id];
+        const showS = !!state.revealedSol[q.id];
+        const corrStr = Array.isArray(q.correct_answer) ? q.correct_answer.join(" | ") : q.correct_answer;
+
+        return `
+          <div class="bg-white p-5 rounded-xl shadow-sm border space-y-3 ${
+            q.matchType === "exact_code" ? "border-2 border-teal-600 ring-2 ring-teal-100" : "border-slate-200"
+          }">
+            <div class="flex flex-wrap justify-between items-center gap-2 text-xs">
+              <div class="flex items-center gap-2 flex-wrap">
+                ${q.question_code ? `<span class="bg-teal-700 text-white font-mono font-bold px-2.5 py-1 rounded">Mã: ${esc(q.question_code)}</span>` : ""}
+                <span class="bg-slate-100 text-slate-700 font-semibold px-2.5 py-1 rounded">Khối ${esc(q.grade_id)} • ${esc(q.chapter)}</span>
+                ${q.matchType === "exact_code" ? `<span class="bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded">✓ Khớp chính xác Mã câu hỏi</span>` : ""}
+                ${q.matchType === "keyword" ? `<span class="bg-sky-50 text-sky-700 font-medium px-2 py-0.5 rounded">Khớp ${q.matchPercent}% từ khóa</span>` : ""}
+              </div>
+              <span class="text-slate-400">👁️ ${q.search_count || 0} lượt xem</span>
+            </div>
+
+            <p class="font-medium text-slate-900 leading-relaxed">
+              ${q.question_code ? "[" + esc(q.question_code) + "] " : "Câu " + (idx + 1) + ": "}${esc(q.content)}
+            </p>
+
+            ${(q.options && q.options.length > 0) ? `
+              <ul class="grid sm:grid-cols-2 gap-2 text-sm text-slate-700 pl-2">
+                ${q.options.map((o) => `<li>• ${esc(o)}</li>`).join("")}
+              </ul>
+            ` : ""}
+
+            <div class="flex flex-wrap gap-2 pt-2">
+              <button onclick="toggleHint('${esc(q.id)}')" class="px-3.5 py-1.5 text-sm bg-amber-100 text-amber-900 font-semibold rounded-lg hover:bg-amber-200">
+                💡 ${showH ? "Ẩn gợi ý" : "Gợi ý phương pháp giải"}
+              </button>
+              <button onclick="toggleSol('${esc(q.id)}')" class="px-3.5 py-1.5 text-sm bg-teal-100 text-teal-900 font-semibold rounded-lg hover:bg-teal-200">
+                📖 ${showS ? "Ẩn đáp án" : "Xem đáp án & lời giải chi tiết"}
+              </button>
+            </div>
+
+            ${showH ? `
+              <div class="bg-amber-50 border-l-4 border-amber-400 p-3.5 text-sm text-amber-950 space-y-1.5 rounded-r-lg">
+                <p class="font-bold text-amber-800">Hướng dẫn tư duy từng bước:</p>
+                ${(q.hints && q.hints.length > 0)
+                  ? q.hints.map((h) => `<p>${esc(h)}</p>`).join("")
+                  : `<p>Đọc kỹ dữ kiện đề bài, viết phương trình hóa học và tính số mol các chất đã biết.</p>`}
+              </div>
+            ` : ""}
+
+            ${showS ? `
+              <div class="bg-teal-50 border-l-4 border-teal-600 p-3.5 text-sm text-teal-950 space-y-1.5 rounded-r-lg">
+                <p class="font-bold text-teal-900 text-base">Đáp án: ${esc(corrStr)}</p>
+                <p class="leading-relaxed whitespace-pre-line">${esc(q.explanation)}</p>
+              </div>
+            ` : ""}
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderLookupResultsOnly() {
+      const box = document.getElementById("lookup-results-box");
+      if (box) box.innerHTML = renderLookupResultsHTML();
+    }
+
+    function renderLookupView() {
+      const sourceList = (state.searchAllGrades && state.searchQuery.trim())
+        ? state.questions
+        : state.questions.filter((q) => q.grade_id === state.selectedGrade);
+      const chapters = ["ALL", ...Array.from(new Set(sourceList.map((q) => q.chapter)))];
+
+      return `
+        <div class="space-y-4">
+          <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-3">
+            <div class="flex flex-wrap justify-between items-center gap-2">
+              <h2 class="font-bold text-lg text-slate-800">Tra cứu hướng dẫn giải & Đáp án</h2>
+              <label class="flex items-center gap-2 text-xs text-slate-600 cursor-pointer">
+                <input type="checkbox" ${state.searchAllGrades ? "checked" : ""}
+                  onchange="state.searchAllGrades = this.checked; renderLookupResultsOnly();"
+                  class="rounded text-teal-600" />
+                Tìm mã câu hỏi trên tất cả các khối lớp
+              </label>
+            </div>
+
+            <div class="grid sm:grid-cols-3 gap-3">
+              <div class="sm:col-span-2 relative">
+                <input type="text" value="${esc(state.searchQuery)}"
+                  oninput="updateSearch(this.value)"
+                  placeholder="Nhập MÃ CÂU HỎI (VD: 9KL-01, 10NT-01) hoặc gõ từ khóa đề bài..."
+                  class="w-full border-2 border-teal-600/40 rounded-lg px-4 py-2.5 focus:outline-none focus:border-teal-600 font-medium" />
+              </div>
+              <select onchange="state.chapterFilter = this.value; renderLookupResultsOnly();"
+                class="border border-slate-300 rounded-lg px-3 py-2.5 text-sm bg-white">
+                ${chapters.map((ch) => `
+                  <option value="${esc(ch)}" ${state.chapterFilter === ch ? "selected" : ""}>
+                    ${ch === "ALL" ? "Tất cả chuyên đề" : esc(ch)}
+                  </option>
+                `).join("")}
+              </select>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500 pt-1">
+              <span>Thử tra nhanh theo mã:</span>
+              ${["9KL-01", "9HC-02", "9KL-05", "10NT-01"].map((c) => `
+                <button type="button" onclick="setQuickCode('${c}')"
+                  class="px-2 py-0.5 bg-slate-100 hover:bg-teal-100 text-teal-800 font-mono font-bold rounded border border-slate-300">
+                  ${c}
+                </button>
+              `).join("")}
+            </div>
+          </div>
+
+          <div id="lookup-results-box" class="space-y-4">
+            ${renderLookupResultsHTML()}
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // CHẾ ĐỘ 2 & 3: LUYỆN TẬP & KIỂM TRA
+    // =========================================================================
+    function setMcqAnswer(qid, opt) {
+      state.answers[qid] = opt;
+      renderAll();
+    }
+
+    function setTfAnswer(qid, idx, choice) {
+      if (!Array.isArray(state.answers[qid])) state.answers[qid] = ["", "", "", ""];
+      state.answers[qid][idx] = choice;
+      renderAll();
+    }
+
+    function calculateScore() {
+      const gQuestions = state.questions.filter((q) => q.grade_id === state.selectedGrade);
+      let total = 0;
+      gQuestions.forEach((q) => {
+        const ans = state.answers[q.id];
+        if (!ans) return;
+        if (q.type === "true_false" && Array.isArray(q.correct_answer)) {
+          let match = 0;
+          q.correct_answer.forEach((val, idx) => { if (ans[idx] === val) match++; });
+          total += ([0, 0.1, 0.25, 0.5, 1.0][match] || 0);
+        } else if (q.type !== "essay") {
+          const u = normalizeText(String(ans)).replace(",", ".");
+          const c = normalizeText(String(q.correct_answer)).replace(",", ".");
+          if (u === c) total += 1;
+        }
+      });
+      return total.toFixed(2);
+    }
+
+    function renderPracticeOrExamView() {
+      const gQuestions = state.questions.filter((q) => q.grade_id === state.selectedGrade);
+      const isExam = state.mode === "exam";
+
+      return `
+        <div class="space-y-5">
+          <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap justify-between items-center gap-3">
+            <div>
+              <h2 class="font-bold text-lg text-slate-800">
+                ${isExam ? "Bài kiểm tra tổng hợp (Đủ 5 dạng bài tập)" : "Chế độ Luyện tập (Kiểm tra đáp án từng câu)"}
+              </h2>
+              <p class="text-sm text-slate-500">Hỗ trợ trắc nghiệm 4 lựa chọn, Đúng/Sai 4 ý, Điền khuyết, Trả lời ngắn và Tự luận.</p>
+            </div>
+            ${isExam ? `
+              <div class="flex items-center gap-3">
+                <span id="exam-timer" class="bg-rose-100 text-rose-700 font-bold px-3 py-1.5 rounded-lg">⏳ ${formatTime(state.timeLeft)}</span>
+                ${!state.examSubmitted ? `
+                  <button onclick="state.examSubmitted = true; renderAll();" class="bg-teal-700 text-white font-bold px-4 py-2 rounded-lg hover:bg-teal-800">
+                    Nộp bài
+                  </button>
+                ` : ""}
+              </div>
+            ` : ""}
+          </div>
+
+          ${(isExam && state.examSubmitted) ? `
+            <div class="bg-emerald-50 border border-emerald-300 p-5 rounded-xl flex justify-between items-center">
+              <div>
+                <h3 class="font-bold text-emerald-900 text-lg">🎉 Đã nộp bài thành công!</h3>
+                <p class="text-sm text-emerald-800">Điểm phần tự động chấm: <strong class="text-xl">${calculateScore()}</strong> điểm.</p>
+              </div>
+              <button onclick="state.examSubmitted = false; state.answers = {}; state.timeLeft = 900; renderAll();"
+                class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-semibold">
+                Làm lại đề
+              </button>
+            </div>
+          ` : ""}
+
+          ${gQuestions.map((q, idx) => {
+            const showSol = (!isExam && state.checkedPractice[q.id]) || (isExam && state.examSubmitted);
+            const corrStr = Array.isArray(q.correct_answer) ? q.correct_answer.join(" | ") : q.correct_answer;
+
+            let inputHTML = "";
+            if (q.type === "mcq") {
+              inputHTML = `<div class="grid sm:grid-cols-2 gap-2">
+                ${q.options.map((opt) => `
+                  <label onclick="setMcqAnswer('${esc(q.id)}', '${esc(opt)}')"
+                    class="flex items-center gap-2 p-3 rounded-lg border cursor-pointer ${state.answers[q.id] === opt ? "border-teal-600 bg-teal-50" : "border-slate-200"}">
+                    <input type="radio" name="${esc(q.id)}" ${state.answers[q.id] === opt ? "checked" : ""} />
+                    <span class="text-sm">${esc(opt)}</span>
+                  </label>
+                `).join("")}
+              </div>`;
+            } else if (q.type === "true_false") {
+              const curArr = state.answers[q.id] || ["", "", "", ""];
+              inputHTML = `<div class="space-y-2">
+                ${q.options.map((sub, i) => `
+                  <div class="flex flex-wrap items-center justify-between gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                    <span class="text-sm flex-1">${esc(sub)}</span>
+                    <div class="flex gap-2">
+                      ${["Đúng", "Sai"].map((ch) => `
+                        <button type="button" onclick="setTfAnswer('${esc(q.id)}', ${i}, '${ch}')"
+                          class="px-3 py-1 rounded text-xs font-bold ${curArr[i] === ch ? "bg-teal-600 text-white" : "bg-white border border-slate-300 text-slate-600"}">
+                          ${ch}
+                        </button>
+                      `).join("")}
+                    </div>
+                  </div>
+                `).join("")}
+              </div>`;
+            } else if (q.type === "fill_blank" || q.type === "short_answer") {
+              inputHTML = `<input type="text" value="${esc(state.answers[q.id] || "")}"
+                oninput="state.answers['${esc(q.id)}'] = this.value"
+                placeholder="Nhập câu trả lời ngắn của em..."
+                class="w-full sm:w-80 border border-slate-300 rounded-lg px-3 py-2 text-sm" />`;
+            } else {
+              inputHTML = `<textarea rows="3" oninput="state.answers['${esc(q.id)}'] = this.value"
+                placeholder="Trình bày lời giải chi tiết..."
+                class="w-full border border-slate-300 rounded-lg p-3 text-sm">${esc(state.answers[q.id] || "")}</textarea>`;
+            }
+
+            return `
+              <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-3">
+                <div class="flex justify-between text-xs text-slate-500">
+                  <div class="flex items-center gap-2">
+                    ${q.question_code ? `<span class="font-mono font-bold bg-slate-200 text-slate-800 px-2 py-0.5 rounded">${esc(q.question_code)}</span>` : ""}
+                    <span class="font-semibold text-teal-700">${esc(q.chapter)}</span>
+                  </div>
+                  <span class="uppercase bg-slate-100 px-2 py-0.5 rounded">${esc(q.type)}</span>
+                </div>
+                <p class="font-medium text-slate-900">Câu ${idx + 1}: ${esc(q.content)}</p>
+                ${inputHTML}
+                ${!isExam ? `
+                  <div class="pt-2">
+                    <button onclick="state.checkedPractice['${esc(q.id)}'] = true; renderAll();"
+                      class="bg-teal-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-teal-700">
+                      Kiểm tra câu này
+                    </button>
+                  </div>
+                ` : ""}
+                ${showSol ? `
+                  <div class="bg-slate-100 p-3 rounded-lg text-sm space-y-1 border-l-4 border-teal-600">
+                    <p class="font-bold text-teal-800">Đáp án chuẩn: ${esc(corrStr)}</p>
+                    <p class="text-slate-700">${esc(q.explanation)}</p>
+                  </div>
+                ` : ""}
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // CHẾ ĐỘ 4: QUẢN TRỊ ĐỘC QUYỀN CỦA GIÁO VIÊN
+    // =========================================================================
+    function autoExtractCode(textarea) {
+      const val = textarea.value;
+      const match = val.trim().match(/^\[([A-Za-z0-9-_]+)\]\s*(.*)$/s);
+      const codeInput = document.getElementById("q-code");
+      if (match && codeInput && !codeInput.value.trim()) {
+        codeInput.value = match[1].toUpperCase();
+        textarea.value = match[2].trim();
+      }
+    }
+
+    async function submitSingleQuestion(e) {
+      e.preventDefault();
+      if (!isAdmin()) return;
+
+      const code = document.getElementById("q-code").value.trim().toUpperCase();
+      const gradeId = document.getElementById("q-grade").value;
+      const chapter = document.getElementById("q-chapter").value.trim();
+      const type = document.getElementById("q-type").value;
+      const content = document.getElementById("q-content").value.trim();
+      const ansRaw = document.getElementById("q-answer").value.trim();
+      const hint1 = document.getElementById("q-hint1").value.trim();
+      const hint2 = document.getElementById("q-hint2").value.trim();
+      const explanation = document.getElementById("q-exp").value.trim();
+
+      const opts = [
+        document.getElementById("q-optA")?.value.trim(),
+        document.getElementById("q-optB")?.value.trim(),
+        document.getElementById("q-optC")?.value.trim(),
+        document.getElementById("q-optD")?.value.trim()
+      ].filter(Boolean);
+
+      const corr = type === "true_false" ? ansRaw.split(",").map((s) => s.trim()) : ansRaw;
+      const hints = [hint1, hint2].filter(Boolean);
+
+      const payload = {
+        question_code: code,
+        grade_id: gradeId,
+        chapter: chapter,
+        type: type,
+        content: content,
+        options: opts,
+        correct_answer: corr,
+        hints: hints,
+        explanation: explanation,
+        search_index: normalizeText(code + " " + chapter + " " + content + " " + opts.join(" "))
+      };
+
+      const { data, error } = await db.from("questions").insert(payload).select();
+      if (error) {
+        alert("Lỗi lưu lên Supabase: " + error.message);
+      } else if (data) {
+        state.questions.unshift(data[0]);
+        alert("Đã lưu thành công câu hỏi có Mã: [" + code + "]!");
+        renderAll();
+      }
+    }
+
+    async function submitBulkImport(e) {
+      e.preventDefault();
+      if (!isAdmin()) return;
+
+      const gradeId = document.getElementById("bulk-grade").value;
+      const chapter = document.getElementById("bulk-chapter").value.trim();
+      const lines = document.getElementById("bulk-text").value.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+
+      const rows = [];
+      for (const line of lines) {
+        const parts = line.split("|").map((p) => p.trim());
+        if (parts.length < 3) continue;
+        const code = parts[0].toUpperCase();
+        rows.push({
+          question_code: code,
+          grade_id: gradeId,
+          chapter: chapter,
+          type: "short_answer",
+          content: parts[1],
+          options: [],
+          correct_answer: parts[2],
+          hints: parts[3] ? [parts[3]] : [],
+          explanation: parts[4] || ("Đáp án chuẩn: " + parts[2]),
+          search_index: normalizeText(code + " " + chapter + " " + parts[1])
+        });
+      }
+
+      if (rows.length === 0) return alert("Mỗi dòng cần đúng dạng: MÃ | ĐỀ BÀI | ĐÁP ÁN");
+
+      const { data, error } = await db.from("questions").insert(rows).select();
+      if (error) return alert("Lỗi nhập hàng loạt: " + error.message);
+      if (data) {
+        state.questions = [...data, ...state.questions];
+        alert("Đã nạp thành công " + data.length + " câu hỏi!");
+        renderAll();
+      }
+    }
+
+    async function submitAddGrade(e) {
+      e.preventDefault();
+      if (!isAdmin()) return;
+      const id = document.getElementById("new-grade-id").value.trim();
+      const name = document.getElementById("new-grade-name").value.trim();
+      const payload = { id, name, description: "Chương trình Hóa học", is_active: true };
+      const { error } = await db.from("grades").insert(payload);
+      if (error) return alert("Lỗi thêm khối: " + error.message);
+      state.grades.push(payload);
+      alert("Đã mở thêm khối lớp mới!");
+      renderAll();
+    }
+
+    async function deleteQuestion(id) {
+      if (!isAdmin() || !confirm("Thầy chắc chắn muốn xóa câu hỏi này?")) return;
+      await db.from("questions").delete().eq("id", id);
+      state.questions = state.questions.filter((q) => q.id !== id);
+      renderAll();
+    }
+
+    function renderAdminView() {
+      return `
+        <div class="space-y-6">
+          <div class="flex flex-wrap gap-2 bg-amber-50 p-3 rounded-xl border border-amber-200">
+            <button onclick="state.adminSubTab = 'single'; renderAll();"
+              class="px-4 py-2 rounded-lg text-sm font-bold ${state.adminSubTab === "single" ? "bg-teal-700 text-white" : "bg-white text-slate-700 border"}">
+              ✍️ Nhập từng câu (Kèm Mã câu hỏi)
+            </button>
+            <button onclick="state.adminSubTab = 'bulk'; renderAll();"
+              class="px-4 py-2 rounded-lg text-sm font-bold ${state.adminSubTab === "bulk" ? "bg-teal-700 text-white" : "bg-white text-slate-700 border"}">
+              ⚡ Nhập hàng loạt nhiều câu có sẵn Mã
+            </button>
+            <button onclick="state.adminSubTab = 'grades'; renderAll();"
+              class="px-4 py-2 rounded-lg text-sm font-bold ${state.adminSubTab === "grades" ? "bg-amber-600 text-white" : "bg-white text-slate-700 border"}">
+              📚 Mở rộng Khối lớp
+            </button>
+          </div>
+
+          ${state.adminSubTab === "single" ? `
+            <div class="bg-white p-6 rounded-xl shadow-sm border-2 border-teal-600/30 space-y-4">
+              <div class="border-b pb-3">
+                <h2 class="font-bold text-lg text-teal-800">Thêm câu hỏi mới & Gắn Mã tra cứu</h2>
+                <p class="text-xs text-slate-500">Mẹo: Dán đề có dạng <code class="bg-slate-100 px-1 rounded">[9KL-06] Nội dung...</code> vào ô đề bài để tự bóc tách Mã câu hỏi.</p>
+              </div>
+              <form onsubmit="submitSingleQuestion(event)" class="space-y-4">
+                <div class="bg-teal-50/70 p-4 rounded-xl border border-teal-200 grid sm:grid-cols-4 gap-3">
+                  <div>
+                    <label class="block text-xs font-extrabold text-teal-900 uppercase mb-1">🔑 Mã câu hỏi (Bắt buộc)</label>
+                    <input id="q-code" required placeholder="VD: 9KL-06" class="w-full border-2 border-teal-600 bg-white rounded-lg p-2 text-sm font-mono font-bold uppercase" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold mb-1">Khối lớp</label>
+                    <select id="q-grade" class="w-full border rounded-lg p-2 text-sm bg-white">
+                      ${state.grades.map((g) => `<option value="${esc(g.id)}">${esc(g.name)}</option>`).join("")}
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold mb-1">Chương / Chủ đề</label>
+                    <input id="q-chapter" required value="Kim loại & Phi kim" class="w-full border rounded-lg p-2 text-sm bg-white" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold mb-1">Dạng câu hỏi</label>
+                    <select id="q-type" class="w-full border rounded-lg p-2 text-sm bg-white">
+                      <option value="mcq">Trắc nghiệm nhiều lựa chọn</option>
+                      <option value="true_false">Trắc nghiệm Đúng/Sai (4 ý)</option>
+                      <option value="fill_blank">Điền khuyết</option>
+                      <option value="short_answer">Trả lời ngắn</option>
+                      <option value="essay">Tự luận</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold mb-1">Nội dung câu hỏi</label>
+                  <textarea id="q-content" required rows="2" oninput="autoExtractCode(this)"
+                    placeholder="Nhập hoặc dán đề bài (có thể dán kèm [MÃ] ở đầu)..."
+                    class="w-full border rounded-lg p-2.5 text-sm"></textarea>
+                </div>
+
+                <div class="grid sm:grid-cols-2 gap-2">
+                  <input id="q-optA" placeholder="Lựa chọn A / Ý a) (Bỏ trống nếu tự luận)" class="border rounded-lg p-2 text-sm" />
+                  <input id="q-optB" placeholder="Lựa chọn B / Ý b)" class="border rounded-lg p-2 text-sm" />
+                  <input id="q-optC" placeholder="Lựa chọn C / Ý c)" class="border rounded-lg p-2 text-sm" />
+                  <input id="q-optD" placeholder="Lựa chọn D / Ý d)" class="border rounded-lg p-2 text-sm" />
+                </div>
+
+                <div class="grid sm:grid-cols-3 gap-3">
+                  <div>
+                    <label class="block text-xs font-semibold mb-1">Đáp án chuẩn</label>
+                    <input id="q-answer" required placeholder="VD: Iron (Fe) hoặc Đúng, Sai, Đúng, Sai" class="w-full border rounded-lg p-2 text-sm" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold mb-1">Gợi ý bước 1</label>
+                    <input id="q-hint1" placeholder="Gợi ý phương pháp giải..." class="w-full border rounded-lg p-2 text-sm" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold mb-1">Gợi ý bước 2 (Tùy chọn)</label>
+                    <input id="q-hint2" placeholder="Công thức áp dụng..." class="w-full border rounded-lg p-2 text-sm" />
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold mb-1">Lời giải chi tiết</label>
+                  <textarea id="q-exp" rows="2" placeholder="Trình bày lời giải chi tiết..." class="w-full border rounded-lg p-2.5 text-sm"></textarea>
+                </div>
+
+                <button type="submit" class="bg-teal-700 text-white font-bold px-5 py-2.5 rounded-lg hover:bg-teal-800 shadow-sm">
+                  + Lưu câu hỏi & Mã tra cứu lên hệ thống
+                </button>
+              </form>
+            </div>
+          ` : ""}
+
+          ${state.adminSubTab === "bulk" ? `
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
+              <div>
+                <h2 class="font-bold text-lg text-teal-800">Nhập nhanh hàng loạt câu hỏi có sẵn Mã</h2>
+                <p class="text-xs text-slate-600 mt-1">
+                  Mỗi dòng 1 câu theo cấu trúc: <code class="bg-slate-100 px-1 rounded font-bold">MÃ | ĐỀ BÀI | ĐÁP ÁN | GỢI Ý | LỜI GIẢI</code>
+                </p>
+              </div>
+              <form onsubmit="submitBulkImport(event)" class="space-y-3">
+                <div class="grid sm:grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-semibold mb-1">Khối lớp</label>
+                    <select id="bulk-grade" class="w-full border rounded-lg p-2 text-sm">
+                      ${state.grades.map((g) => `<option value="${esc(g.id)}">${esc(g.name)}</option>`).join("")}
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold mb-1">Chương / Chủ đề</label>
+                    <input id="bulk-chapter" required value="Kim loại & Phi kim" class="w-full border rounded-lg p-2 text-sm" />
+                  </div>
+                </div>
+                <textarea id="bulk-text" required rows="6"
+                  placeholder="9KL-10 | Hòa tan 2,4g Mg vào HCl dư thu được bao nhiêu lít H2 (đkc)? | 2,479 L | Tính n(Mg) = 0,1 mol | V = 0,1 x 24,79 = 2,479 L"
+                  class="w-full border rounded-lg p-3 text-sm font-mono"></textarea>
+                <button type="submit" class="bg-teal-700 text-white font-bold px-5 py-2.5 rounded-lg hover:bg-teal-800">
+                  ⚡ Nạp toàn bộ danh sách lên hệ thống
+                </button>
+              </form>
+            </div>
+          ` : ""}
+
+          ${state.adminSubTab === "grades" ? `
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-amber-200">
+              <h2 class="font-bold text-base text-amber-900 mb-3">Quản lý & Mở rộng Khối lớp</h2>
+              <form onsubmit="submitAddGrade(event)" class="flex flex-wrap gap-3">
+                <input id="new-grade-id" required placeholder="Mã khối (VD: 8, 11, ONTHI)" class="border rounded-lg px-3 py-2 text-sm" />
+                <input id="new-grade-name" required placeholder="Tên hiển thị (VD: Khối 8, Ôn thi vào 10)" class="border rounded-lg px-3 py-2 text-sm flex-1" />
+                <button type="submit" class="bg-amber-600 text-white font-semibold px-4 py-2 rounded-lg text-sm hover:bg-amber-700">
+                  + Thêm khối lớp
+                </button>
+              </form>
+            </div>
+          ` : ""}
+
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-3">
+            <h2 class="font-bold text-lg text-slate-800">Danh sách câu hỏi & Mã đã lưu (${state.questions.length} câu)</h2>
+            ${state.questions.map((q) => `
+              <div class="flex justify-between items-start gap-3 p-3 border rounded-lg text-sm">
+                <div>
+                  <span class="font-mono font-bold bg-teal-700 text-white px-2 py-0.5 rounded mr-2">
+                    ${esc(q.question_code || "CHƯA CÓ MÃ")}
+                  </span>
+                  <span class="text-xs font-bold text-slate-500">[Khối ${esc(q.grade_id)} - ${esc(q.chapter)}] </span>
+                  <span>${esc(q.content)}</span>
+                </div>
+                <button onclick="deleteQuestion('${esc(q.id)}')" class="text-xs text-rose-600 hover:underline font-semibold shrink-0">Xóa</button>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    // Chạy khởi tạo ngay khi tải xong trang
+    initApp();
   </script>
 </body>
 </html>
