@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="index, follow" />
-  <meta name="description" content="Cổng học liệu Hóa học trực tuyến - Thầy Chiến. Tra cứu lời giải chuẩn IUPAC, ôn tập chuyên đề, thi thử và kho tài liệu KHTN 9 - Hóa học 10." />
-  <title>Hóa Học Thầy Chiến (v4.6) - Cổng Học Liệu & Tra Cứu Lời Giải</title>
+  <meta name="description" content="Cổng học liệu Hóa học trực tuyến - Thầy Chiến. Ôn tập chuyên đề (Lý thuyết & Bài tập), tra cứu lời giải chuẩn IUPAC, thi thử và kho tài liệu." />
+  <title>Hóa Học Thầy Chiến (v4.7) - Cổng Học Liệu & Ôn Tập Chuyên Đề</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
@@ -28,7 +28,7 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="font-bold text-lg leading-tight tracking-tight">HÓA HỌC THẦY CHIẾN</h1>
-            <span class="text-[11px] bg-teal-950 text-amber-300 font-mono px-2 py-0.5 rounded">v4.6</span>
+            <span class="text-[11px] bg-teal-950 text-amber-300 font-mono px-2 py-0.5 rounded">v4.7</span>
           </div>
           <p class="text-xs text-teal-200 hidden sm:block">Cổng học liệu chuẩn GDPT 2018 • Danh pháp IUPAC</p>
         </div>
@@ -100,7 +100,33 @@
     const STUDENT_CLASS_CODE = "THAYCHIEN";
     const TEACHER_ADMIN_CODE = "ADMIN_THAYCHIEN";
 
-    // Kho tài liệu mặc định (Thầy có thể thêm tài liệu mới qua mục Quản trị hoặc lưu trong localStorage/Supabase)
+    const DEFAULT_CHAPTERS = [
+      {
+        id: "ch1",
+        grade_id: "9",
+        title: "Kim loại & Phi kim",
+        theory: "1. Dãy hoạt động hóa học của kim loại:\n$$K, Na, Ca, Mg, Al, Zn, Fe, Ni, Sn, Pb, (H), Cu, Hg, Ag, Pt, Au$$\n2. Tính chất hóa học chung:\n- Kim loại đứng trước $H$ tác dụng với dung dịch acid ($HCl, H_2SO_4$ loãng) giải phóng khí $H_2\\uparrow$.\n- Kim loại mạnh hơn (trừ $K, Na, Ca$) đẩy kim loại yếu hơn ra khỏi dung dịch muối."
+      },
+      {
+        id: "ch2",
+        grade_id: "9",
+        title: "Hợp chất hữu cơ - Hydrocarbon",
+        theory: "1. Alkane (tiêu biểu Methane $CH_4$): chỉ có liên kết đơn, phản ứng đặc trưng là phản ứng thế với $Cl_2$ (ánh sáng).\n2. Alkene (tiêu biểu Ethylene $C_2H_4$): có 1 liên kết đôi $C=C$, làm mất màu dung dịch bromine ($Br_2$) ở điều kiện thường."
+      },
+      {
+        id: "ch3",
+        grade_id: "10",
+        title: "Cấu tạo nguyên tử",
+        theory: "1. Các hạt cơ bản: Proton ($p$, mang điện $+1$), Neutron ($n$, không mang điện), Electron ($e$, mang điện $-1$).\n2. Nguyên tử trung hòa điện: $p = e = Z$. Số khối: $A = Z + N$."
+      },
+      {
+        id: "ch4",
+        grade_id: "10",
+        title: "Liên kết hóa học",
+        theory: "1. Liên kết ion: hình thành bởi lực hút tĩnh điện giữa cation (ion dương) và anion (ion âm).\n2. Liên kết cộng hóa trị: hình thành bởi một hay nhiều cặp electron dùng chung giữa hai nguyên tử."
+      }
+    ];
+
     const DEFAULT_DOCS = [
       {
         id: "doc1",
@@ -108,7 +134,7 @@
         category: "Tóm tắt lý thuyết",
         title: "Bảng hệ thống hóa tính chất hóa học của Kim loại & Phi kim (KHTN 9)",
         summary: "Tổng hợp dãy hoạt động hóa học của kim loại, phản ứng với oxygen, nước, dung dịch acid và dung dịch muối theo danh pháp IUPAC.",
-        link: "#tailieu-kimloai9"
+        link: ""
       },
       {
         id: "doc2",
@@ -116,7 +142,7 @@
         category: "Chuyên đề ôn thi",
         title: "Chuyên đề Hydrocarbon: Alkane – Alkene và ứng dụng thực tiễn",
         summary: "So sánh cấu tạo phân tử, phản ứng thế của Methane ($CH_4$) và phản ứng cộng làm mất màu nước bromine của Ethylene ($C_2H_4$).",
-        link: "#tailieu-hydrocarbon9"
+        link: ""
       },
       {
         id: "doc3",
@@ -124,7 +150,7 @@
         category: "Công thức & Quy tắc",
         title: "Sổ tay Cấu tạo nguyên tử & Bảng tuần hoàn các nguyên tố hóa học (Hóa 10)",
         summary: "Quy tắc viết cấu hình electron nguyên tử, xác định vị trí nguyên tố (ô, chu kì, nhóm) và xu hướng biến đổi tính chất.",
-        link: "#tailieu-nguyentu10"
+        link: ""
       },
       {
         id: "doc4",
@@ -132,7 +158,7 @@
         category: "Hướng dẫn tra cứu",
         title: "Bảng quy đổi danh pháp tiếng Anh IUPAC chuẩn GDPT 2018",
         summary: "Tra cứu nhanh tên gọi mới của các nguyên tố (Iron, Copper, Aluminium...), oxide, acid, base và muối thường gặp.",
-        link: "#tailieu-iupac"
+        link: ""
       }
     ];
 
@@ -229,19 +255,32 @@
         { id: "10", name: "Khối 10", description: "Hóa học 10 (KNTT)" }
       ],
       selectedGrade: "9",
-      mode: "home", // Mặc định vào trang chủ Portal chuyên nghiệp
+      mode: "home",
       questions: [...SAMPLE_QUESTIONS],
+      chaptersList: [...DEFAULT_CHAPTERS],
       docs: JSON.parse(localStorage.getItem("thaychien_docs") || "null") || [...DEFAULT_DOCS],
+
+      // Trạng thái cổng lọc Ôn tập chuyên đề (Mặc định để trống, chưa chọn chuyên đề nào)
+      practiceGrade: "9",
+      practiceSelectedChapter: "",
+      practiceTopicSearch: "",
+      practiceSectionTab: "exercises", // 'theory' hoặc 'exercises'
+
+      // Trạng thái Tra cứu
       searchQuery: "",
       chapterFilter: "ALL",
       searchAllGrades: true,
       revealedHints: {},
       revealedSol: {},
+
+      // Trạng thái Làm bài & Thi
       answers: {},
       checkedPractice: {},
       examSubmitted: false,
       timeLeft: 900,
       timerInterval: null,
+
+      // Trạng thái Quản trị
       adminSubTab: "single"
     };
 
@@ -302,6 +341,26 @@
       return state.user && state.user.role === "admin";
     }
 
+    // Tổng hợp danh sách chuyên đề theo khối lớp (kết hợp từ bảng chapters và các câu hỏi hiện có)
+    function getAvailableChaptersForGrade(gradeId) {
+      const map = new Map();
+      state.chaptersList
+        .filter((c) => c.grade_id === gradeId)
+        .forEach((c) => {
+          map.set(c.title, { id: c.id, grade_id: c.grade_id, title: c.title, theory: c.theory || "" });
+        });
+
+      state.questions
+        .filter((q) => q.grade_id === gradeId)
+        .forEach((q) => {
+          if (q.chapter && !map.has(q.chapter)) {
+            map.set(q.chapter, { id: "auto_" + q.chapter, grade_id: gradeId, title: q.chapter, theory: "" });
+          }
+        });
+
+      return Array.from(map.values());
+    }
+
     function applyUrlQueryParam() {
       const params = new URLSearchParams(window.location.search);
       const qParam = params.get("cau") || params.get("q");
@@ -346,7 +405,7 @@
           });
         }
       } else {
-        document.title = "Hóa Học Thầy Chiến (v4.6) - Cổng Học Liệu & Tra Cứu Lời Giải";
+        document.title = "Hóa Học Thầy Chiến (v4.7) - Cổng Học Liệu & Ôn Tập Chuyên Đề";
         if (schemaEl) {
           schemaEl.textContent = JSON.stringify({
             "@context": "https://schema.org",
@@ -385,6 +444,9 @@
       try {
         const { data: gData } = await db.from("grades").select("*").eq("is_active", true);
         if (gData && gData.length > 0) state.grades = gData;
+
+        const { data: chData } = await db.from("chapters").select("*").order("created_at", { ascending: true });
+        if (chData && chData.length > 0) state.chaptersList = chData;
 
         const { data: qData } = await db.from("questions").select("*").order("created_at", { ascending: false });
         if (qData && qData.length > 0) state.questions = qData;
@@ -523,6 +585,8 @@
 
     function selectGrade(id) {
       state.selectedGrade = id;
+      state.practiceGrade = id;
+      state.practiceSelectedChapter = "";
       state.chapterFilter = "ALL";
       state.examSubmitted = false;
       renderAll();
@@ -530,6 +594,12 @@
 
     function selectMode(m) {
       state.mode = m;
+      if (m === "practice") {
+        // Khi mở vào Ôn tập chuyên đề, reset lựa chọn chuyên đề để hiện cổng chọn sạch sẽ
+        state.practiceGrade = state.selectedGrade;
+        state.practiceSelectedChapter = "";
+        state.practiceTopicSearch = "";
+      }
       if (state.timerInterval) clearInterval(state.timerInterval);
       if (m === "exam" && !state.examSubmitted) {
         state.timerInterval = setInterval(() => {
@@ -624,7 +694,8 @@
       const main = document.getElementById("app-main");
       if (state.mode === "home") main.innerHTML = renderHomeView();
       else if (state.mode === "lookup") main.innerHTML = renderLookupView();
-      else if (state.mode === "practice" || state.mode === "exam") main.innerHTML = renderPracticeOrExamView();
+      else if (state.mode === "practice") main.innerHTML = renderTopicPracticeView();
+      else if (state.mode === "exam") main.innerHTML = renderExamView();
       else if (state.mode === "docs") main.innerHTML = renderDocsView();
       else if (state.mode === "admin" && isAdmin()) main.innerHTML = renderAdminView();
 
@@ -632,16 +703,16 @@
     }
 
     // =========================================================================
-    // TRANG CHỦ PORTAL MỞ ĐẦU CHUYÊN NGHIỆP
+    // TRANG CHỦ PORTAL MỞ ĐẦU
     // =========================================================================
     function renderHomeView() {
       const currentGradeObj = state.grades.find((g) => g.id === state.selectedGrade) || state.grades[0];
       const totalQ = state.questions.length;
       const totalDocs = state.docs.length;
+      const totalChapters = state.chaptersList.length;
 
       return `
         <div class="space-y-8">
-          <!-- HERO BANNER & THANH TÌM KIẾM TRUNG TÂM -->
           <section class="bg-gradient-to-br from-teal-900 via-teal-800 to-emerald-800 text-white rounded-2xl p-6 sm:p-10 shadow-lg relative overflow-hidden">
             <div class="max-w-3xl mx-auto text-center space-y-5 relative z-10">
               <span class="inline-block bg-teal-950/60 border border-teal-500/40 text-amber-300 text-xs font-bold px-3.5 py-1 rounded-full tracking-wide">
@@ -651,10 +722,9 @@
                 Chào mừng đến với Cổng Học Liệu <span class="text-amber-300">Hóa Học Thầy Chiến</span>
               </h2>
               <p class="text-sm sm:text-base text-teal-100 max-w-2xl mx-auto leading-relaxed">
-                Hệ thống tra cứu lời giải chi tiết theo mã bài tập, ôn tập phân hóa theo từng chuyên đề, luyện đề trực tuyến và kho tài liệu Hóa học dành cho học sinh <strong>${esc(currentGradeObj.name)}</strong>.
+                Hệ thống tra cứu lời giải chi tiết theo mã bài tập, ôn tập phân hóa theo từng chuyên đề (Lý thuyết & Bài tập), luyện đề trực tuyến và kho tài liệu dành cho <strong>${esc(currentGradeObj.name)}</strong>.
               </p>
 
-              <!-- HỘP TÌM KIẾM ĐÁP ÁN NHANH -->
               <form onsubmit="triggerHeroSearch(event)" class="max-w-2xl mx-auto pt-2">
                 <div class="flex flex-col sm:flex-row gap-2 bg-white p-2 rounded-xl shadow-md">
                   <input
@@ -681,7 +751,6 @@
             </div>
           </section>
 
-          <!-- CÁC PHÂN MỤC CHỨC NĂNG CHÍNH (PORTAL CARDS) -->
           <section class="space-y-4">
             <div class="flex items-center justify-between">
               <h3 class="font-bold text-lg text-slate-800">Danh mục học tập & Tra cứu</h3>
@@ -689,13 +758,10 @@
             </div>
 
             <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <!-- Mục 1: Tìm kiếm đáp án -->
               <div onclick="selectMode('lookup')"
                 class="group bg-white p-6 rounded-2xl border border-slate-200 hover:border-teal-600 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between space-y-4">
                 <div class="space-y-2.5">
-                  <div class="w-12 h-12 rounded-xl bg-teal-100 text-teal-800 flex items-center justify-center text-2xl font-bold group-hover:bg-teal-700 group-hover:text-white transition">
-                    🔍
-                  </div>
+                  <div class="w-12 h-12 rounded-xl bg-teal-100 text-teal-800 flex items-center justify-center text-2xl font-bold group-hover:bg-teal-700 group-hover:text-white transition">🔍</div>
                   <h4 class="font-bold text-base text-slate-900 group-hover:text-teal-700">1. Tìm kiếm Đáp án</h4>
                   <p class="text-xs text-slate-600 leading-relaxed">
                     Tra cứu nhanh bằng Mã bài tập in trên phiếu hoặc gõ từ khóa đề bài để xem gợi ý tư duy và lời giải chi tiết.
@@ -707,31 +773,25 @@
                 </div>
               </div>
 
-              <!-- Mục 2: Ôn tập chuyên đề -->
               <div onclick="selectMode('practice')"
                 class="group bg-white p-6 rounded-2xl border border-slate-200 hover:border-emerald-600 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between space-y-4">
                 <div class="space-y-2.5">
-                  <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center text-2xl font-bold group-hover:bg-emerald-700 group-hover:text-white transition">
-                    🎯
-                  </div>
+                  <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center text-2xl font-bold group-hover:bg-emerald-700 group-hover:text-white transition">🎯</div>
                   <h4 class="font-bold text-base text-slate-900 group-hover:text-emerald-700">2. Ôn tập Chuyên đề</h4>
                   <p class="text-xs text-slate-600 leading-relaxed">
-                    Tự luyện từng câu hỏi theo chủ đề kiến thức, kiểm tra kết quả ngay lập tức và xem phân tích lỗi sai.
+                    Chọn lớp và chuyên đề cần học để xem tóm tắt lý thuyết trọng tâm và tự luyện hệ thống bài tập từng bài.
                   </p>
                 </div>
                 <div class="pt-2 border-t border-slate-100 flex justify-between items-center text-xs font-bold text-emerald-700">
-                  <span>Luyện tập tương tác</span>
-                  <span>Bắt đầu ôn →</span>
+                  <span>${totalChapters} chuyên đề / bài học</span>
+                  <span>Chọn chuyên đề →</span>
                 </div>
               </div>
 
-              <!-- Mục 3: Kiểm tra / Thi thử -->
               <div onclick="selectMode('exam')"
                 class="group bg-white p-6 rounded-2xl border border-slate-200 hover:border-rose-600 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between space-y-4">
                 <div class="space-y-2.5">
-                  <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-800 flex items-center justify-center text-2xl font-bold group-hover:bg-rose-600 group-hover:text-white transition">
-                    ⏱️
-                  </div>
+                  <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-800 flex items-center justify-center text-2xl font-bold group-hover:bg-rose-600 group-hover:text-white transition">⏱️</div>
                   <h4 class="font-bold text-base text-slate-900 group-hover:text-rose-700">3. Kiểm tra & Thi thử</h4>
                   <p class="text-xs text-slate-600 leading-relaxed">
                     Đề tổng hợp chuẩn cấu trúc mới (Trắc nghiệm, Đúng/Sai 4 ý, Trả lời ngắn, Tự luận) có tính giờ và chấm điểm.
@@ -743,27 +803,23 @@
                 </div>
               </div>
 
-              <!-- Mục 4: Kho Tài liệu -->
               <div onclick="selectMode('docs')"
                 class="group bg-white p-6 rounded-2xl border border-slate-200 hover:border-amber-600 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between space-y-4">
                 <div class="space-y-2.5">
-                  <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center text-2xl font-bold group-hover:bg-amber-600 group-hover:text-white transition">
-                    📚
-                  </div>
+                  <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center text-2xl font-bold group-hover:bg-amber-600 group-hover:text-white transition">📚</div>
                   <h4 class="font-bold text-base text-slate-900 group-hover:text-amber-700">4. Kho Tài liệu & Lý thuyết</h4>
                   <p class="text-xs text-slate-600 leading-relaxed">
                     Tóm tắt trọng tâm từng chương, bảng danh pháp IUPAC, sơ đồ phản ứng và phiếu bài tập bổ trợ của Thầy Chiến.
                   </p>
                 </div>
                 <div class="pt-2 border-t border-slate-100 flex justify-between items-center text-xs font-bold text-amber-700">
-                  <span>${totalDocs} chuyên đề tài liệu</span>
+                  <span>${totalDocs} tài liệu bổ trợ</span>
                   <span>Mở kho →</span>
                 </div>
               </div>
             </div>
           </section>
 
-          <!-- THÔNG TIN HƯỚNG DẪN & GÓC THÔNG BÁO -->
           <section class="grid md:grid-cols-3 gap-4">
             <div class="md:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 space-y-3">
               <h3 class="font-bold text-base text-teal-900 flex items-center gap-2">
@@ -801,74 +857,328 @@
     }
 
     // =========================================================================
-    // MỤC 4: KHO TÀI LIỆU & LÝ THUYẾT
+    // MỤC 2: ÔN TẬP CHUYÊN ĐỀ (CỔNG LỌC 2 BƯỚC + TÁCH LÝ THUYẾT & BÀI TẬP)
     // =========================================================================
-    function renderDocsView() {
-      const gradeDocs = state.docs.filter((d) => d.grade_id === state.selectedGrade || d.grade_id === "ALL");
+    function onChangePracticeGrade(newGradeId) {
+      state.practiceGrade = newGradeId;
+      state.selectedGrade = newGradeId;
+      state.practiceSelectedChapter = "";
+      state.practiceTopicSearch = "";
+      renderAll();
+    }
+
+    function onSelectPracticeChapter(chapterTitle) {
+      state.practiceSelectedChapter = chapterTitle;
+      state.practiceSectionTab = "exercises";
+      renderAll();
+    }
+
+    function renderTopicPracticeView() {
+      const chaptersOfGrade = getAvailableChaptersForGrade(state.practiceGrade);
+      const searchNorm = normalizeText(state.practiceTopicSearch);
+      const filteredChapters = searchNorm
+        ? chaptersOfGrade.filter((c) => normalizeText(c.title).includes(searchNorm))
+        : chaptersOfGrade;
+
+      const selectedChObj = chaptersOfGrade.find((c) => c.title === state.practiceSelectedChapter);
+      const topicQuestions = state.practiceSelectedChapter
+        ? state.questions.filter((q) => q.grade_id === state.practiceGrade && q.chapter === state.practiceSelectedChapter)
+        : [];
+
       return `
-        <div class="space-y-5">
-          <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-wrap justify-between items-center gap-3">
-            <div>
-              <h2 class="font-bold text-lg text-slate-800">📚 Kho Tài liệu & Tóm tắt kiến thức</h2>
-              <p class="text-sm text-slate-500">Tổng hợp chuyên đề, bảng tra cứu IUPAC và tài liệu ôn tập của Thầy Chiến.</p>
+        <div class="max-w-5xl mx-auto space-y-5">
+          <!-- CỔNG LỌC 2 BƯỚC GỌN GÀNG (LỚP + CHUYÊN ĐỀ / BÀI HỌC) -->
+          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+            <div class="flex flex-wrap justify-between items-center gap-2 border-b border-slate-100 pb-3">
+              <div>
+                <h2 class="font-bold text-lg text-slate-800">🎯 Cổng Ôn Tập Chuyên Đề & Bài Học</h2>
+                <p class="text-xs text-slate-500">Bước 1: Chọn Khối lớp • Bước 2: Chọn Chuyên đề hoặc Bài học để mở Lý thuyết & Bài tập.</p>
+              </div>
+              <button onclick="goHome()" class="text-xs font-semibold text-teal-700 hover:underline">← Trang chủ</button>
             </div>
-            <button onclick="goHome()" class="text-xs font-semibold text-teal-700 hover:underline">← Quay lại Trang chủ</button>
+
+            <div class="grid sm:grid-cols-12 gap-3">
+              <!-- Cổng lọc 1: Chọn Lớp -->
+              <div class="sm:col-span-3">
+                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">1. Chọn Khối lớp</label>
+                <select onchange="onChangePracticeGrade(this.value)"
+                  class="w-full border-2 border-teal-600/30 focus:border-teal-600 rounded-xl px-3 py-2.5 text-sm font-semibold bg-white">
+                  ${state.grades.map((g) => `
+                    <option value="${esc(g.id)}" ${state.practiceGrade === g.id ? "selected" : ""}>${esc(g.name)}</option>
+                  `).join("")}
+                </select>
+              </div>
+
+              <!-- Cổng lọc 2: Xổ xuống Chuyên đề / Bài -->
+              <div class="sm:col-span-5">
+                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">2. Chọn Chuyên đề / Bài học</label>
+                <select onchange="onSelectPracticeChapter(this.value)"
+                  class="w-full border-2 border-teal-600/30 focus:border-teal-600 rounded-xl px-3 py-2.5 text-sm font-semibold bg-white">
+                  <option value="">-- Bấm để chọn chuyên đề / bài học --</option>
+                  ${chaptersOfGrade.map((c) => {
+                    const count = state.questions.filter((q) => q.grade_id === state.practiceGrade && q.chapter === c.title).length;
+                    return `<option value="${esc(c.title)}" ${state.practiceSelectedChapter === c.title ? "selected" : ""}>${esc(c.title)} (${count} câu)</option>`;
+                  }).join("")}
+                </select>
+              </div>
+
+              <!-- Ô tìm nhanh tên chuyên đề -->
+              <div class="sm:col-span-4">
+                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Tìm nhanh chuyên đề</label>
+                <input type="text" value="${esc(state.practiceTopicSearch)}"
+                  oninput="state.practiceTopicSearch = this.value; renderAll();"
+                  placeholder="Gõ tên bài (VD: Kim loại, Alkane...)"
+                  class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm bg-slate-50 focus:bg-white focus:outline-none focus:border-teal-600" />
+              </div>
+            </div>
           </div>
 
-          <div class="grid md:grid-cols-2 gap-4">
-            ${gradeDocs.map((doc) => `
-              <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between space-y-3">
-                <div class="space-y-2">
-                  <div class="flex items-center gap-2 text-xs">
-                    <span class="bg-amber-100 text-amber-900 font-bold px-2.5 py-0.5 rounded">${esc(doc.category)}</span>
-                    <span class="bg-slate-100 text-slate-600 font-semibold px-2 py-0.5 rounded">Khối ${esc(doc.grade_id)}</span>
-                  </div>
-                  <h3 class="font-bold text-base text-slate-900">${esc(doc.title)}</h3>
-                  <div class="text-sm text-slate-600 leading-relaxed">${formatRichText(doc.summary)}</div>
+          <!-- TRẠNG THÁI CHƯA CHỌN CHUYÊN ĐỀ: CHỈ HIỆN DANH MỤC THẺ CHUYÊN ĐỀ GỌN GÀNG, KHÔNG ĐỔ CÂU HỎI -->
+          ${!state.practiceSelectedChapter ? `
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 space-y-4">
+              <div class="flex items-center justify-between">
+                <h3 class="font-bold text-base text-teal-900">Danh sách chuyên đề / bài học (${filteredChapters.length})</h3>
+                <span class="text-xs text-slate-400">Bấm vào một chuyên đề bên dưới để bắt đầu ôn tập</span>
+              </div>
+
+              ${filteredChapters.length === 0 ? `
+                <p class="text-sm text-slate-500 py-6 text-center">Chưa có chuyên đề nào khớp với từ khóa tìm kiếm của em.</p>
+              ` : `
+                <div class="grid sm:grid-cols-2 gap-3">
+                  ${filteredChapters.map((c, idx) => {
+                    const qCount = state.questions.filter((q) => q.grade_id === state.practiceGrade && q.chapter === c.title).length;
+                    const hasTheory = c.theory && c.theory.trim().length > 0;
+                    return `
+                      <div onclick="onSelectPracticeChapter('${esc(c.title)}')"
+                        class="group p-4 rounded-xl border border-slate-200 hover:border-teal-600 bg-slate-50/60 hover:bg-teal-50/40 transition cursor-pointer flex items-center justify-between gap-3">
+                        <div class="space-y-1">
+                          <div class="flex items-center gap-2">
+                            <span class="bg-teal-700 text-white text-xs font-bold px-2 py-0.5 rounded">Bài ${idx + 1}</span>
+                            <h4 class="font-bold text-sm sm:text-base text-slate-900 group-hover:text-teal-800">${esc(c.title)}</h4>
+                          </div>
+                          <p class="text-xs text-slate-500">
+                            ${hasTheory ? "📖 Có tóm tắt lý thuyết • " : ""}✍️ ${qCount} bài tập luyện tập
+                          </p>
+                        </div>
+                        <span class="text-xs font-bold text-teal-700 shrink-0 group-hover:translate-x-0.5 transition">Mở bài →</span>
+                      </div>
+                    `;
+                  }).join("")}
                 </div>
-                <div class="pt-3 border-t border-slate-100 flex justify-between items-center">
-                  ${doc.link && doc.link.startsWith("http") ? `
-                    <a href="${esc(doc.link)}" target="_blank" rel="noopener" class="text-xs font-bold text-teal-700 hover:underline">
-                      📥 Mở / Tải tài liệu (Google Drive / PDF) →
-                    </a>
-                  ` : `
-                    <button onclick="selectMode('lookup')" class="text-xs font-bold text-teal-700 hover:underline">
-                      🔍 Tra cứu bài tập chuyên đề này →
-                    </button>
-                  `}
-                  ${isAdmin() ? `
-                    <button onclick="deleteDoc('${esc(doc.id)}')" class="text-xs text-rose-600 hover:underline">Xóa</button>
-                  ` : ""}
+              `}
+            </div>
+          ` : `
+            <!-- ĐÃ CHỌN 1 CHUYÊN ĐỀ CỤ THỂ: HIỂN THỊ 2 PHẦN (LÝ THUYẾT & BÀI TẬP) -->
+            <div class="space-y-4">
+              <div class="bg-teal-900 text-white p-5 rounded-2xl shadow-sm flex flex-wrap justify-between items-center gap-3">
+                <div>
+                  <span class="text-xs text-amber-300 font-bold uppercase">Khối ${esc(state.practiceGrade)} • Chuyên đề đang ôn tập</span>
+                  <h3 class="text-xl font-extrabold mt-0.5">${esc(state.practiceSelectedChapter)}</h3>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button onclick="state.practiceSectionTab = 'theory'; renderAll();"
+                    class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition ${
+                      state.practiceSectionTab === "theory" ? "bg-amber-400 text-slate-950 shadow" : "bg-teal-800 text-white hover:bg-teal-700"
+                    }">
+                    📖 Phần I: Tóm tắt Lý thuyết
+                  </button>
+                  <button onclick="state.practiceSectionTab = 'exercises'; renderAll();"
+                    class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition ${
+                      state.practiceSectionTab === "exercises" ? "bg-amber-400 text-slate-950 shadow" : "bg-teal-800 text-white hover:bg-teal-700"
+                    }">
+                    ✍️ Phần II: Bài tập vận dụng (${topicQuestions.length})
+                  </button>
+                  <button onclick="onSelectPracticeChapter('')"
+                    class="px-3 py-2 rounded-xl text-xs bg-teal-950/70 text-teal-200 hover:text-white border border-teal-700">
+                    Đổi bài khác
+                  </button>
                 </div>
               </div>
-            `).join("")}
-          </div>
+
+              <!-- TAB LÝ THUYẾT CHUYÊN ĐỀ -->
+              ${state.practiceSectionTab === "theory" ? `
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                  <div class="flex justify-between items-center border-b pb-3">
+                    <h4 class="font-bold text-base text-teal-900">📖 Kiến thức trọng tâm & Công thức cần nhớ</h4>
+                    <button onclick="state.practiceSectionTab = 'exercises'; renderAll();"
+                      class="text-xs font-bold bg-teal-700 text-white px-3.5 py-1.5 rounded-lg hover:bg-teal-800">
+                      Chuyển sang làm Bài tập (${topicQuestions.length} câu) →
+                    </button>
+                  </div>
+                  ${(selectedChObj && selectedChObj.theory && selectedChObj.theory.trim()) ? `
+                    <div class="text-sm sm:text-base text-slate-800 leading-relaxed bg-amber-50/40 p-5 rounded-xl border border-amber-200/70">
+                      ${formatRichText(selectedChObj.theory)}
+                    </div>
+                  ` : `
+                    <div class="text-center py-8 space-y-2">
+                      <p class="text-sm text-slate-500">Chuyên đề này chưa cập nhật phần tóm tắt lý thuyết.</p>
+                      <button onclick="state.practiceSectionTab = 'exercises'; renderAll();" class="text-xs font-bold text-teal-700 hover:underline">
+                        Làm ngay hệ thống bài tập của chuyên đề →
+                      </button>
+                    </div>
+                  `}
+                </div>
+              ` : `
+                <!-- TAB BÀI TẬP CHUYÊN ĐỀ -->
+                <div class="space-y-4">
+                  ${topicQuestions.length === 0 ? `
+                    <div class="bg-white p-8 rounded-2xl border border-slate-200 text-center space-y-2">
+                      <p class="text-slate-600 font-medium">Chuyên đề "${esc(state.practiceSelectedChapter)}" hiện chưa có câu hỏi bài tập nào.</p>
+                      <p class="text-xs text-slate-400">Thầy Chiến có thể vào mục Quản trị Giáo viên để bổ sung câu hỏi cho chuyên đề này.</p>
+                    </div>
+                  ` : topicQuestions.map((q, idx) => renderSinglePracticeCard(q, idx, false)).join("")}
+                </div>
+              `}
+            </div>
+          `}
         </div>
       `;
     }
 
-    function addNewDoc(e) {
-      e.preventDefault();
-      if (!isAdmin()) return;
-      const newDoc = {
-        id: "doc_" + Date.now(),
-        grade_id: document.getElementById("doc-grade").value,
-        category: document.getElementById("doc-cat").value.trim(),
-        title: document.getElementById("doc-title").value.trim(),
-        summary: document.getElementById("doc-summary").value.trim(),
-        link: document.getElementById("doc-link").value.trim()
-      };
-      state.docs.unshift(newDoc);
-      localStorage.setItem("thaychien_docs", JSON.stringify(state.docs));
-      alert("Đã đăng tài liệu mới lên Kho Tài liệu!");
+    function renderSinglePracticeCard(q, idx, isExam) {
+      const showSol = (!isExam && state.checkedPractice[q.id]) || (isExam && state.examSubmitted);
+      const corrStr = Array.isArray(q.correct_answer) ? q.correct_answer.join(" | ") : q.correct_answer;
+
+      let inputHTML = "";
+      if (q.type === "mcq") {
+        inputHTML = `<div class="grid sm:grid-cols-2 gap-2">
+          ${q.options.map((opt) => `
+            <label onclick="setMcqAnswer('${esc(q.id)}', '${esc(opt)}')"
+              class="flex items-center gap-2 p-3 rounded-lg border cursor-pointer ${state.answers[q.id] === opt ? "border-teal-600 bg-teal-50" : "border-slate-200"}">
+              <input type="radio" name="${esc(q.id)}" ${state.answers[q.id] === opt ? "checked" : ""} />
+              <span class="text-sm">${esc(opt)}</span>
+            </label>
+          `).join("")}
+        </div>`;
+      } else if (q.type === "true_false") {
+        const curArr = state.answers[q.id] || ["", "", "", ""];
+        inputHTML = `<div class="space-y-2">
+          ${q.options.map((sub, i) => `
+            <div class="flex flex-wrap items-center justify-between gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+              <span class="text-sm flex-1">${esc(sub)}</span>
+              <div class="flex gap-2">
+                ${["Đúng", "Sai"].map((ch) => `
+                  <button type="button" onclick="setTfAnswer('${esc(q.id)}', ${i}, '${ch}')"
+                    class="px-3 py-1 rounded text-xs font-bold ${curArr[i] === ch ? "bg-teal-600 text-white" : "bg-white border border-slate-300 text-slate-600"}">
+                    ${ch}
+                  </button>
+                `).join("")}
+              </div>
+            </div>
+          `).join("")}
+        </div>`;
+      } else if (q.type === "fill_blank" || q.type === "short_answer") {
+        inputHTML = `<input type="text" value="${esc(state.answers[q.id] || "")}"
+          oninput="state.answers['${esc(q.id)}'] = this.value"
+          placeholder="Nhập câu trả lời ngắn của em..."
+          class="w-full sm:w-80 border border-slate-300 rounded-lg px-3 py-2 text-sm" />`;
+      } else {
+        inputHTML = `<textarea rows="3" oninput="state.answers['${esc(q.id)}'] = this.value"
+          placeholder="Trình bày lời giải chi tiết..."
+          class="w-full border border-slate-300 rounded-lg p-3 text-sm">${esc(state.answers[q.id] || "")}</textarea>`;
+      }
+
+      return `
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-3">
+          <div class="flex justify-between text-xs text-slate-500">
+            <div class="flex items-center gap-2">
+              ${q.question_code ? `<span class="font-mono font-bold bg-slate-200 text-slate-800 px-2 py-0.5 rounded">${esc(q.question_code)}</span>` : ""}
+              <span class="font-semibold text-teal-700">${esc(q.chapter)}</span>
+            </div>
+            <span class="uppercase bg-slate-100 px-2 py-0.5 rounded">${esc(q.type)}</span>
+          </div>
+          <div class="font-medium text-slate-900">
+            <span class="font-bold">Câu ${idx + 1}:</span> ${formatRichText(q.content)}
+          </div>
+          ${inputHTML}
+          ${!isExam ? `
+            <div class="pt-2">
+              <button onclick="state.checkedPractice['${esc(q.id)}'] = true; renderAll();"
+                class="bg-teal-600 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg hover:bg-teal-700">
+                Kiểm tra câu này
+              </button>
+            </div>
+          ` : ""}
+          ${showSol ? `
+            <div class="bg-slate-100 p-4 rounded-lg text-sm space-y-2 border-l-4 border-teal-600">
+              <p class="font-bold text-teal-800">Đáp án chuẩn: ${esc(corrStr)}</p>
+              <div class="text-slate-700">${formatRichText(q.explanation)}</div>
+            </div>
+          ` : ""}
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // MỤC 3: KIỂM TRA / THI THỬ
+    // =========================================================================
+    function setMcqAnswer(qid, opt) {
+      state.answers[qid] = opt;
       renderAll();
     }
 
-    function deleteDoc(id) {
-      if (!isAdmin() || !confirm("Xóa tài liệu này?")) return;
-      state.docs = state.docs.filter((d) => d.id !== id);
-      localStorage.setItem("thaychien_docs", JSON.stringify(state.docs));
+    function setTfAnswer(qid, idx, choice) {
+      if (!Array.isArray(state.answers[qid])) state.answers[qid] = ["", "", "", ""];
+      state.answers[qid][idx] = choice;
       renderAll();
+    }
+
+    function calculateScore() {
+      const gQuestions = state.questions.filter((q) => q.grade_id === state.selectedGrade);
+      let total = 0;
+      gQuestions.forEach((q) => {
+        const ans = state.answers[q.id];
+        if (!ans) return;
+        if (q.type === "true_false" && Array.isArray(q.correct_answer)) {
+          let match = 0;
+          q.correct_answer.forEach((val, idx) => { if (ans[idx] === val) match++; });
+          total += ([0, 0.1, 0.25, 0.5, 1.0][match] || 0);
+        } else if (q.type !== "essay") {
+          const u = normalizeText(String(ans)).replace(",", ".");
+          const c = normalizeText(String(q.correct_answer)).replace(",", ".");
+          if (u === c) total += 1;
+        }
+      });
+      return total.toFixed(2);
+    }
+
+    function renderExamView() {
+      const gQuestions = state.questions.filter((q) => q.grade_id === state.selectedGrade);
+
+      return `
+        <div class="max-w-5xl mx-auto space-y-5">
+          <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap justify-between items-center gap-3">
+            <div>
+              <h2 class="font-bold text-lg text-slate-800">⏱️ Bài kiểm tra tổng hợp Khối ${esc(state.selectedGrade)}</h2>
+              <p class="text-sm text-slate-500">Hỗ trợ trắc nghiệm 4 lựa chọn, Đúng/Sai 4 ý, Điền khuyết, Trả lời ngắn và Tự luận.</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <span id="exam-timer" class="bg-rose-100 text-rose-700 font-bold px-3 py-1.5 rounded-lg">⏳ ${formatTime(state.timeLeft)}</span>
+              ${!state.examSubmitted ? `
+                <button onclick="state.examSubmitted = true; renderAll();" class="bg-teal-700 text-white font-bold px-4 py-2 rounded-lg hover:bg-teal-800">
+                  Nộp bài
+                </button>
+              ` : ""}
+              <button onclick="goHome()" class="text-xs font-semibold text-teal-700 hover:underline">← Trang chủ</button>
+            </div>
+          </div>
+
+          ${state.examSubmitted ? `
+            <div class="bg-emerald-50 border border-emerald-300 p-5 rounded-xl flex justify-between items-center">
+              <div>
+                <h3 class="font-bold text-emerald-900 text-lg">🎉 Đã nộp bài thành công!</h3>
+                <p class="text-sm text-emerald-800">Điểm phần tự động chấm: <strong class="text-xl">${calculateScore()}</strong> điểm.</p>
+              </div>
+              <button onclick="state.examSubmitted = false; state.answers = {}; state.timeLeft = 900; renderAll();"
+                class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-semibold">
+                Làm lại đề
+              </button>
+            </div>
+          ` : ""}
+
+          ${gQuestions.map((q, idx) => renderSinglePracticeCard(q, idx, true)).join("")}
+        </div>
+      `;
     }
 
     // =========================================================================
@@ -1082,156 +1392,78 @@
     }
 
     // =========================================================================
-    // MỤC 2 & 3: ÔN TẬP & KIỂM TRA
+    // MỤC 4: KHO TÀI LIỆU
     // =========================================================================
-    function setMcqAnswer(qid, opt) {
-      state.answers[qid] = opt;
-      renderAll();
-    }
-
-    function setTfAnswer(qid, idx, choice) {
-      if (!Array.isArray(state.answers[qid])) state.answers[qid] = ["", "", "", ""];
-      state.answers[qid][idx] = choice;
-      renderAll();
-    }
-
-    function calculateScore() {
-      const gQuestions = state.questions.filter((q) => q.grade_id === state.selectedGrade);
-      let total = 0;
-      gQuestions.forEach((q) => {
-        const ans = state.answers[q.id];
-        if (!ans) return;
-        if (q.type === "true_false" && Array.isArray(q.correct_answer)) {
-          let match = 0;
-          q.correct_answer.forEach((val, idx) => { if (ans[idx] === val) match++; });
-          total += ([0, 0.1, 0.25, 0.5, 1.0][match] || 0);
-        } else if (q.type !== "essay") {
-          const u = normalizeText(String(ans)).replace(",", ".");
-          const c = normalizeText(String(q.correct_answer)).replace(",", ".");
-          if (u === c) total += 1;
-        }
-      });
-      return total.toFixed(2);
-    }
-
-    function renderPracticeOrExamView() {
-      const gQuestions = state.questions.filter((q) => q.grade_id === state.selectedGrade);
-      const isExam = state.mode === "exam";
-
+    function renderDocsView() {
+      const gradeDocs = state.docs.filter((d) => d.grade_id === state.selectedGrade || d.grade_id === "ALL");
       return `
-        <div class="max-w-5xl mx-auto space-y-5">
-          <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap justify-between items-center gap-3">
+        <div class="space-y-5">
+          <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-wrap justify-between items-center gap-3">
             <div>
-              <h2 class="font-bold text-lg text-slate-800">
-                ${isExam ? "⏱️ Bài kiểm tra tổng hợp (Đủ 5 dạng bài tập)" : "🎯 Ôn tập chuyên đề (Kiểm tra đáp án từng câu)"}
-              </h2>
-              <p class="text-sm text-slate-500">Hỗ trợ trắc nghiệm 4 lựa chọn, Đúng/Sai 4 ý, Điền khuyết, Trả lời ngắn và Tự luận.</p>
+              <h2 class="font-bold text-lg text-slate-800">📚 Kho Tài liệu & Tóm tắt kiến thức</h2>
+              <p class="text-sm text-slate-500">Tổng hợp chuyên đề, bảng tra cứu IUPAC và tài liệu ôn tập của Thầy Chiến.</p>
             </div>
-            <div class="flex items-center gap-3">
-              ${isExam ? `
-                <span id="exam-timer" class="bg-rose-100 text-rose-700 font-bold px-3 py-1.5 rounded-lg">⏳ ${formatTime(state.timeLeft)}</span>
-                ${!state.examSubmitted ? `
-                  <button onclick="state.examSubmitted = true; renderAll();" class="bg-teal-700 text-white font-bold px-4 py-2 rounded-lg hover:bg-teal-800">
-                    Nộp bài
-                  </button>
-                ` : ""}
-              ` : ""}
-              <button onclick="goHome()" class="text-xs font-semibold text-teal-700 hover:underline">← Trang chủ</button>
-            </div>
+            <button onclick="goHome()" class="text-xs font-semibold text-teal-700 hover:underline">← Quay lại Trang chủ</button>
           </div>
 
-          ${(isExam && state.examSubmitted) ? `
-            <div class="bg-emerald-50 border border-emerald-300 p-5 rounded-xl flex justify-between items-center">
-              <div>
-                <h3 class="font-bold text-emerald-900 text-lg">🎉 Đã nộp bài thành công!</h3>
-                <p class="text-sm text-emerald-800">Điểm phần tự động chấm: <strong class="text-xl">${calculateScore()}</strong> điểm.</p>
-              </div>
-              <button onclick="state.examSubmitted = false; state.answers = {}; state.timeLeft = 900; renderAll();"
-                class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-semibold">
-                Làm lại đề
-              </button>
-            </div>
-          ` : ""}
-
-          ${gQuestions.map((q, idx) => {
-            const showSol = (!isExam && state.checkedPractice[q.id]) || (isExam && state.examSubmitted);
-            const corrStr = Array.isArray(q.correct_answer) ? q.correct_answer.join(" | ") : q.correct_answer;
-
-            let inputHTML = "";
-            if (q.type === "mcq") {
-              inputHTML = `<div class="grid sm:grid-cols-2 gap-2">
-                ${q.options.map((opt) => `
-                  <label onclick="setMcqAnswer('${esc(q.id)}', '${esc(opt)}')"
-                    class="flex items-center gap-2 p-3 rounded-lg border cursor-pointer ${state.answers[q.id] === opt ? "border-teal-600 bg-teal-50" : "border-slate-200"}">
-                    <input type="radio" name="${esc(q.id)}" ${state.answers[q.id] === opt ? "checked" : ""} />
-                    <span class="text-sm">${esc(opt)}</span>
-                  </label>
-                `).join("")}
-              </div>`;
-            } else if (q.type === "true_false") {
-              const curArr = state.answers[q.id] || ["", "", "", ""];
-              inputHTML = `<div class="space-y-2">
-                ${q.options.map((sub, i) => `
-                  <div class="flex flex-wrap items-center justify-between gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200">
-                    <span class="text-sm flex-1">${esc(sub)}</span>
-                    <div class="flex gap-2">
-                      ${["Đúng", "Sai"].map((ch) => `
-                        <button type="button" onclick="setTfAnswer('${esc(q.id)}', ${i}, '${ch}')"
-                          class="px-3 py-1 rounded text-xs font-bold ${curArr[i] === ch ? "bg-teal-600 text-white" : "bg-white border border-slate-300 text-slate-600"}">
-                          ${ch}
-                        </button>
-                      `).join("")}
-                    </div>
+          <div class="grid md:grid-cols-2 gap-4">
+            ${gradeDocs.map((doc) => `
+              <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between space-y-3">
+                <div class="space-y-2">
+                  <div class="flex items-center gap-2 text-xs">
+                    <span class="bg-amber-100 text-amber-900 font-bold px-2.5 py-0.5 rounded">${esc(doc.category)}</span>
+                    <span class="bg-slate-100 text-slate-600 font-semibold px-2 py-0.5 rounded">Khối ${esc(doc.grade_id)}</span>
                   </div>
-                `).join("")}
-              </div>`;
-            } else if (q.type === "fill_blank" || q.type === "short_answer") {
-              inputHTML = `<input type="text" value="${esc(state.answers[q.id] || "")}"
-                oninput="state.answers['${esc(q.id)}'] = this.value"
-                placeholder="Nhập câu trả lời ngắn của em..."
-                class="w-full sm:w-80 border border-slate-300 rounded-lg px-3 py-2 text-sm" />`;
-            } else {
-              inputHTML = `<textarea rows="3" oninput="state.answers['${esc(q.id)}'] = this.value"
-                placeholder="Trình bày lời giải chi tiết..."
-                class="w-full border border-slate-300 rounded-lg p-3 text-sm">${esc(state.answers[q.id] || "")}</textarea>`;
-            }
-
-            return `
-              <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-3">
-                <div class="flex justify-between text-xs text-slate-500">
-                  <div class="flex items-center gap-2">
-                    ${q.question_code ? `<span class="font-mono font-bold bg-slate-200 text-slate-800 px-2 py-0.5 rounded">${esc(q.question_code)}</span>` : ""}
-                    <span class="font-semibold text-teal-700">${esc(q.chapter)}</span>
-                  </div>
-                  <span class="uppercase bg-slate-100 px-2 py-0.5 rounded">${esc(q.type)}</span>
+                  <h3 class="font-bold text-base text-slate-900">${esc(doc.title)}</h3>
+                  <div class="text-sm text-slate-600 leading-relaxed">${formatRichText(doc.summary)}</div>
                 </div>
-                <div class="font-medium text-slate-900">
-                  <span class="font-bold">Câu ${idx + 1}:</span> ${formatRichText(q.content)}
-                </div>
-                ${inputHTML}
-                ${!isExam ? `
-                  <div class="pt-2">
-                    <button onclick="state.checkedPractice['${esc(q.id)}'] = true; renderAll();"
-                      class="bg-teal-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-teal-700">
-                      Kiểm tra câu này
+                <div class="pt-3 border-t border-slate-100 flex justify-between items-center">
+                  ${doc.link && doc.link.startsWith("http") ? `
+                    <a href="${esc(doc.link)}" target="_blank" rel="noopener" class="text-xs font-bold text-teal-700 hover:underline">
+                      📥 Mở / Tải tài liệu (Google Drive / PDF) →
+                    </a>
+                  ` : `
+                    <button onclick="selectMode('practice')" class="text-xs font-bold text-teal-700 hover:underline">
+                      🎯 Mở cổng Ôn tập chuyên đề này →
                     </button>
-                  </div>
-                ` : ""}
-                ${showSol ? `
-                  <div class="bg-slate-100 p-4 rounded-lg text-sm space-y-2 border-l-4 border-teal-600">
-                    <p class="font-bold text-teal-800">Đáp án chuẩn: ${esc(corrStr)}</p>
-                    <div class="text-slate-700">${formatRichText(q.explanation)}</div>
-                  </div>
-                ` : ""}
+                  `}
+                  ${isAdmin() ? `
+                    <button onclick="deleteDoc('${esc(doc.id)}')" class="text-xs text-rose-600 hover:underline">Xóa</button>
+                  ` : ""}
+                </div>
               </div>
-            `;
-          }).join("")}
+            `).join("")}
+          </div>
         </div>
       `;
     }
 
+    function addNewDoc(e) {
+      e.preventDefault();
+      if (!isAdmin()) return;
+      const newDoc = {
+        id: "doc_" + Date.now(),
+        grade_id: document.getElementById("doc-grade").value,
+        category: document.getElementById("doc-cat").value.trim(),
+        title: document.getElementById("doc-title").value.trim(),
+        summary: document.getElementById("doc-summary").value.trim(),
+        link: document.getElementById("doc-link").value.trim()
+      };
+      state.docs.unshift(newDoc);
+      localStorage.setItem("thaychien_docs", JSON.stringify(state.docs));
+      alert("Đã đăng tài liệu mới lên Kho Tài liệu!");
+      renderAll();
+    }
+
+    function deleteDoc(id) {
+      if (!isAdmin() || !confirm("Xóa tài liệu này?")) return;
+      state.docs = state.docs.filter((d) => d.id !== id);
+      localStorage.setItem("thaychien_docs", JSON.stringify(state.docs));
+      renderAll();
+    }
+
     // =========================================================================
-    // MỤC QUẢN TRỊ ĐỘC QUYỀN CỦA GIÁO VIÊN
+    // MỤC QUẢN TRỊ ĐỘC QUYỀN CỦA GIÁO VIÊN (THÊM CHUYÊN ĐỀ / BÀI + CÂU HỎI)
     // =========================================================================
     function autoExtractCode(textarea) {
       const val = textarea.value;
@@ -1254,13 +1486,68 @@
       el.selectionStart = el.selectionEnd = start + snippet.length;
     }
 
+    function syncAdminChapterOptions(gradeSelectId, chapterSelectId) {
+      const gId = document.getElementById(gradeSelectId)?.value || "9";
+      const chSelect = document.getElementById(chapterSelectId);
+      if (!chSelect) return;
+      const list = getAvailableChaptersForGrade(gId);
+      chSelect.innerHTML = list.map((c) => `<option value="${esc(c.title)}">${esc(c.title)}</option>`).join("")
+        + `<option value="__NEW__">+ Nhập tên chuyên đề khác...</option>`;
+    }
+
+    function handleChapterSelectChange(selectEl, customInputId) {
+      const customInp = document.getElementById(customInputId);
+      if (!customInp) return;
+      if (selectEl.value === "__NEW__") {
+        customInp.classList.remove("hidden");
+        customInp.required = true;
+        customInp.focus();
+      } else {
+        customInp.classList.add("hidden");
+        customInp.required = false;
+      }
+    }
+
+    async function submitAddChapter(e) {
+      e.preventDefault();
+      if (!isAdmin()) return;
+      const gradeId = document.getElementById("ch-grade").value;
+      const title = document.getElementById("ch-title").value.trim();
+      const theory = document.getElementById("ch-theory").value.trim();
+
+      const payload = { grade_id: gradeId, title, theory };
+      const { data, error } = await db.from("chapters").insert(payload).select();
+      if (error) {
+        // Dự phòng nếu chưa chạy SQL tạo bảng chapters
+        state.chaptersList.push({ id: "ch_" + Date.now(), ...payload });
+        alert("Đã thêm chuyên đề vào bộ nhớ tạm (Thầy nhớ chạy lệnh SQL tạo bảng chapters trên Supabase để lưu vĩnh viễn nhé!).");
+      } else if (data) {
+        state.chaptersList.push(data[0]);
+        alert(`Đã lưu thành công chuyên đề "${title}" vào hệ thống!`);
+      }
+      renderAll();
+    }
+
+    async function deleteChapterItem(id, title) {
+      if (!isAdmin() || !confirm(`Xóa chuyên đề "${title}" khỏi danh mục?`)) return;
+      if (!String(id).startsWith("ch_") && !String(id).startsWith("auto_")) {
+        await db.from("chapters").delete().eq("id", id);
+      }
+      state.chaptersList = state.chaptersList.filter((c) => c.id !== id);
+      renderAll();
+    }
+
     async function submitSingleQuestion(e) {
       e.preventDefault();
       if (!isAdmin()) return;
 
       const code = document.getElementById("q-code").value.trim().toUpperCase();
       const gradeId = document.getElementById("q-grade").value;
-      const chapter = document.getElementById("q-chapter").value.trim();
+      const chSelectVal = document.getElementById("q-chapter-select").value;
+      const chapter = chSelectVal === "__NEW__"
+        ? document.getElementById("q-chapter-custom").value.trim()
+        : chSelectVal;
+
       const type = document.getElementById("q-type").value;
       const content = document.getElementById("q-content").value.trim();
       const ansRaw = document.getElementById("q-answer").value.trim();
@@ -1296,7 +1583,7 @@
         alert("Lỗi lưu lên Supabase: " + error.message);
       } else if (data) {
         state.questions.unshift(data[0]);
-        alert("Đã lưu thành công câu hỏi có Mã: [" + code + "]!");
+        alert("Đã lưu thành công câu hỏi có Mã: [" + code + "] vào chuyên đề \"" + chapter + "\"!");
         renderAll();
       }
     }
@@ -1306,7 +1593,10 @@
       if (!isAdmin()) return;
 
       const gradeId = document.getElementById("bulk-grade").value;
-      const chapter = document.getElementById("bulk-chapter").value.trim();
+      const chSelectVal = document.getElementById("bulk-chapter-select").value;
+      const chapter = chSelectVal === "__NEW__"
+        ? document.getElementById("bulk-chapter-custom").value.trim()
+        : chSelectVal;
       const lines = document.getElementById("bulk-text").value.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
 
       const rows = [];
@@ -1360,27 +1650,93 @@
     }
 
     function renderAdminView() {
+      const defaultChapters = getAvailableChaptersForGrade("9");
+
       return `
         <div class="max-w-5xl mx-auto space-y-6">
           <div class="flex flex-wrap gap-2 bg-amber-50 p-3 rounded-xl border border-amber-200">
+            <button onclick="state.adminSubTab = 'chapters'; renderAll();"
+              class="px-4 py-2 rounded-lg text-sm font-bold ${state.adminSubTab === "chapters" ? "bg-teal-700 text-white" : "bg-white text-slate-700 border"}">
+              📑 1. Thêm Chuyên đề / Bài & Lý thuyết
+            </button>
             <button onclick="state.adminSubTab = 'single'; renderAll();"
               class="px-4 py-2 rounded-lg text-sm font-bold ${state.adminSubTab === "single" ? "bg-teal-700 text-white" : "bg-white text-slate-700 border"}">
-              ✍️ Nhập từng câu (Kèm Mã & LaTeX)
+              ✍️ 2. Nhập từng câu hỏi
             </button>
             <button onclick="state.adminSubTab = 'bulk'; renderAll();"
               class="px-4 py-2 rounded-lg text-sm font-bold ${state.adminSubTab === "bulk" ? "bg-teal-700 text-white" : "bg-white text-slate-700 border"}">
-              ⚡ Nhập hàng loạt câu hỏi
+              ⚡ 3. Nhập hàng loạt câu hỏi
             </button>
             <button onclick="state.adminSubTab = 'docs'; renderAll();"
               class="px-4 py-2 rounded-lg text-sm font-bold ${state.adminSubTab === "docs" ? "bg-teal-700 text-white" : "bg-white text-slate-700 border"}">
-              📚 Đăng Tài liệu / Chuyên đề
+              📚 4. Đăng Tài liệu PDF/Drive
             </button>
             <button onclick="state.adminSubTab = 'grades'; renderAll();"
               class="px-4 py-2 rounded-lg text-sm font-bold ${state.adminSubTab === "grades" ? "bg-amber-600 text-white" : "bg-white text-slate-700 border"}">
-              🎓 Mở rộng Khối lớp
+              🎓 5. Mở rộng Khối lớp
             </button>
           </div>
 
+          <!-- TAB THÊM CHUYÊN ĐỀ / BÀI HỌC & TÓM TẮT LÝ THUYẾT -->
+          ${state.adminSubTab === "chapters" ? `
+            <div class="bg-white p-6 rounded-xl shadow-sm border-2 border-teal-600/30 space-y-5">
+              <div class="border-b pb-3">
+                <h2 class="font-bold text-lg text-teal-800">Tạo Chuyên đề / Bài học mới (Kèm Lý thuyết trọng tâm)</h2>
+                <p class="text-xs text-slate-500">Chuyên đề tạo ở đây sẽ hiển thị ngay trong cổng chọn <strong>Ôn tập chuyên đề</strong> của học sinh và danh sách chọn khi nhập câu hỏi.</p>
+              </div>
+
+              <form onsubmit="submitAddChapter(event)" class="space-y-4">
+                <div class="grid sm:grid-cols-3 gap-3">
+                  <div>
+                    <label class="block text-xs font-semibold mb-1">Thuộc Khối lớp</label>
+                    <select id="ch-grade" class="w-full border rounded-lg p-2.5 text-sm bg-white">
+                      ${state.grades.map((g) => `<option value="${esc(g.id)}">${esc(g.name)}</option>`).join("")}
+                    </select>
+                  </div>
+                  <div class="sm:col-span-2">
+                    <label class="block text-xs font-semibold mb-1">Tên Chuyên đề / Bài học (Bắt buộc)</label>
+                    <input id="ch-title" required placeholder="VD: Bài 18: Tính chất chung của kim loại (hoặc Chuyên đề Acid - Base)"
+                      class="w-full border rounded-lg p-2.5 text-sm" />
+                  </div>
+                </div>
+
+                <div class="space-y-1.5">
+                  <div class="flex flex-wrap items-center justify-between gap-2">
+                    <label class="block text-xs font-semibold">Nội dung Tóm tắt Lý thuyết & Công thức (Hỗ trợ LaTeX / MathType)</label>
+                    <div class="flex flex-wrap gap-1 text-xs">
+                      <button type="button" onclick="insertSnippet('ch-theory', '\\rightarrow')" class="px-2 py-0.5 bg-slate-100 hover:bg-teal-100 border rounded font-mono">→</button>
+                      <button type="button" onclick="insertSnippet('ch-theory', '\\xrightarrow{t^\\circ}')" class="px-2 py-0.5 bg-slate-100 hover:bg-teal-100 border rounded font-mono">→ (t°)</button>
+                      <button type="button" onclick="insertSnippet('ch-theory', '\n$$ ... $$\n')" class="px-2 py-0.5 bg-slate-100 hover:bg-teal-100 border rounded font-mono">Công thức dòng riêng</button>
+                    </div>
+                  </div>
+                  <textarea id="ch-theory" rows="5"
+                    placeholder="Nhập tóm tắt lý thuyết trọng tâm của chuyên đề hoặc bài học này (nhấn Enter để xuống dòng)..."
+                    class="w-full border rounded-lg p-3 text-sm"></textarea>
+                </div>
+
+                <button type="submit" class="bg-teal-700 text-white font-bold px-5 py-2.5 rounded-lg hover:bg-teal-800 shadow-sm">
+                  + Lưu Chuyên đề / Bài học mới
+                </button>
+              </form>
+
+              <div class="pt-4 border-t space-y-2">
+                <h3 class="font-bold text-sm text-slate-700">Danh mục Chuyên đề / Bài học hiện có (${state.chaptersList.length})</h3>
+                <div class="grid sm:grid-cols-2 gap-2">
+                  ${state.chaptersList.map((c) => `
+                    <div class="flex justify-between items-center p-3 border rounded-lg text-sm bg-slate-50">
+                      <div>
+                        <span class="text-xs font-bold bg-teal-100 text-teal-800 px-2 py-0.5 rounded mr-1.5">Khối ${esc(c.grade_id)}</span>
+                        <span class="font-semibold text-slate-800">${esc(c.title)}</span>
+                      </div>
+                      <button onclick="deleteChapterItem('${esc(c.id)}', '${esc(c.title)}')" class="text-xs text-rose-600 hover:underline font-semibold">Xóa</button>
+                    </div>
+                  `).join("")}
+                </div>
+              </div>
+            </div>
+          ` : ""}
+
+          <!-- TAB NHẬP TỪNG CÂU HỎI -->
           ${state.adminSubTab === "single" ? `
             <div class="bg-white p-6 rounded-xl shadow-sm border-2 border-teal-600/30 space-y-4">
               <div class="border-b pb-3 space-y-1">
@@ -1397,13 +1753,17 @@
                   </div>
                   <div>
                     <label class="block text-xs font-semibold mb-1">Khối lớp</label>
-                    <select id="q-grade" class="w-full border rounded-lg p-2 text-sm bg-white">
+                    <select id="q-grade" onchange="syncAdminChapterOptions('q-grade', 'q-chapter-select')" class="w-full border rounded-lg p-2 text-sm bg-white">
                       ${state.grades.map((g) => `<option value="${esc(g.id)}">${esc(g.name)}</option>`).join("")}
                     </select>
                   </div>
                   <div>
-                    <label class="block text-xs font-semibold mb-1">Chương / Chủ đề</label>
-                    <input id="q-chapter" required value="Kim loại & Phi kim" class="w-full border rounded-lg p-2 text-sm bg-white" />
+                    <label class="block text-xs font-semibold mb-1">Chuyên đề / Bài học</label>
+                    <select id="q-chapter-select" onchange="handleChapterSelectChange(this, 'q-chapter-custom')" class="w-full border rounded-lg p-2 text-sm bg-white">
+                      ${defaultChapters.map((c) => `<option value="${esc(c.title)}">${esc(c.title)}</option>`).join("")}
+                      <option value="__NEW__">+ Nhập tên chuyên đề khác...</option>
+                    </select>
+                    <input id="q-chapter-custom" placeholder="Nhập tên chuyên đề mới..." class="hidden mt-1.5 w-full border border-teal-500 rounded-lg p-2 text-sm bg-white" />
                   </div>
                   <div>
                     <label class="block text-xs font-semibold mb-1">Dạng câu hỏi</label>
@@ -1470,6 +1830,7 @@
             </div>
           ` : ""}
 
+          <!-- TAB NHẬP HÀNG LOẠT -->
           ${state.adminSubTab === "bulk" ? `
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
               <div>
@@ -1482,13 +1843,17 @@
                 <div class="grid sm:grid-cols-2 gap-3">
                   <div>
                     <label class="block text-xs font-semibold mb-1">Khối lớp</label>
-                    <select id="bulk-grade" class="w-full border rounded-lg p-2 text-sm">
+                    <select id="bulk-grade" onchange="syncAdminChapterOptions('bulk-grade', 'bulk-chapter-select')" class="w-full border rounded-lg p-2 text-sm">
                       ${state.grades.map((g) => `<option value="${esc(g.id)}">${esc(g.name)}</option>`).join("")}
                     </select>
                   </div>
                   <div>
-                    <label class="block text-xs font-semibold mb-1">Chương / Chủ đề</label>
-                    <input id="bulk-chapter" required value="Kim loại & Phi kim" class="w-full border rounded-lg p-2 text-sm" />
+                    <label class="block text-xs font-semibold mb-1">Chuyên đề / Bài học</label>
+                    <select id="bulk-chapter-select" onchange="handleChapterSelectChange(this, 'bulk-chapter-custom')" class="w-full border rounded-lg p-2 text-sm bg-white">
+                      ${defaultChapters.map((c) => `<option value="${esc(c.title)}">${esc(c.title)}</option>`).join("")}
+                      <option value="__NEW__">+ Nhập tên chuyên đề khác...</option>
+                    </select>
+                    <input id="bulk-chapter-custom" placeholder="Nhập tên chuyên đề mới..." class="hidden mt-1.5 w-full border border-teal-500 rounded-lg p-2 text-sm bg-white" />
                   </div>
                 </div>
                 <textarea id="bulk-text" required rows="6"
@@ -1501,6 +1866,7 @@
             </div>
           ` : ""}
 
+          <!-- TAB ĐĂNG TÀI LIỆU -->
           ${state.adminSubTab === "docs" ? `
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
               <h2 class="font-bold text-lg text-teal-800">Đăng Tài liệu / Chuyên đề mới lên Kho Tài liệu</h2>
@@ -1537,6 +1903,7 @@
             </div>
           ` : ""}
 
+          <!-- TAB MỞ RỘNG KHỐI LỚP -->
           ${state.adminSubTab === "grades" ? `
             <div class="bg-white p-5 rounded-xl shadow-sm border border-amber-200">
               <h2 class="font-bold text-base text-amber-900 mb-3">Quản lý & Mở rộng Khối lớp</h2>
