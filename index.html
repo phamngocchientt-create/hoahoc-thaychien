@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="index, follow" />
-  <meta name="description" content="Cổng học liệu Hóa học trực tuyến - Thầy Chiến. Ôn tập chuyên đề (Lý thuyết & Bài tập), tra cứu lời giải chuẩn IUPAC, thi thử và kho tài liệu." />
-  <title>Hóa Học Thầy Chiến (v4.7) - Cổng Học Liệu & Ôn Tập Chuyên Đề</title>
+  <meta name="description" content="Cổng học liệu Hóa học trực tuyến - Thầy Chiến. Ôn tập chuyên đề, tra cứu lời giải chuẩn IUPAC, thi thử và kho tài liệu." />
+  <title>Hóa Học Thầy Chiến (v4.8) - Cổng Học Liệu & Ôn Tập Chuyên Đề</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
@@ -28,7 +28,7 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="font-bold text-lg leading-tight tracking-tight">HÓA HỌC THẦY CHIẾN</h1>
-            <span class="text-[11px] bg-teal-950 text-amber-300 font-mono px-2 py-0.5 rounded">v4.7</span>
+            <span class="text-[11px] bg-teal-950 text-amber-300 font-mono px-2 py-0.5 rounded">v4.8</span>
           </div>
           <p class="text-xs text-teal-200 hidden sm:block">Cổng học liệu chuẩn GDPT 2018 • Danh pháp IUPAC</p>
         </div>
@@ -40,7 +40,6 @@
       </div>
     </div>
 
-    <!-- THANH ĐIỀU HƯỚNG NHANH -->
     <nav class="bg-teal-800/90 border-t border-teal-700/60">
       <div id="nav-tabs" class="max-w-6xl mx-auto px-4 flex overflow-x-auto gap-1.5 py-2"></div>
     </nav>
@@ -105,19 +104,19 @@
         id: "ch1",
         grade_id: "9",
         title: "Kim loại & Phi kim",
-        theory: "1. Dãy hoạt động hóa học của kim loại:\n$$K, Na, Ca, Mg, Al, Zn, Fe, Ni, Sn, Pb, (H), Cu, Hg, Ag, Pt, Au$$\n2. Tính chất hóa học chung:\n- Kim loại đứng trước $H$ tác dụng với dung dịch acid ($HCl, H_2SO_4$ loãng) giải phóng khí $H_2\\uparrow$.\n- Kim loại mạnh hơn (trừ $K, Na, Ca$) đẩy kim loại yếu hơn ra khỏi dung dịch muối."
+        theory: "1. Dãy hoạt động hóa học của kim loại:\nK, Na, Ca, Mg, Al, Zn, Fe, Ni, Sn, Pb, (H), Cu, Hg, Ag, Pt, Au\n2. Tính chất hóa học chung:\n- Kim loại đứng trước H tác dụng với dung dịch acid (HCl, H₂SO₄ loãng) giải phóng khí H₂↑.\n- Ví dụ nhiệt phân: $$CaCO_3 \\xrightarrow{t^\\circ} CaO + CO_2\\uparrow$$"
       },
       {
         id: "ch2",
         grade_id: "9",
         title: "Hợp chất hữu cơ - Hydrocarbon",
-        theory: "1. Alkane (tiêu biểu Methane $CH_4$): chỉ có liên kết đơn, phản ứng đặc trưng là phản ứng thế với $Cl_2$ (ánh sáng).\n2. Alkene (tiêu biểu Ethylene $C_2H_4$): có 1 liên kết đôi $C=C$, làm mất màu dung dịch bromine ($Br_2$) ở điều kiện thường."
+        theory: "1. Alkane (tiêu biểu Methane CH₄): chỉ có liên kết đơn, phản ứng đặc trưng là phản ứng thế với Cl₂ (ánh sáng).\n2. Alkene (tiêu biểu Ethylene C₂H₄): có 1 liên kết đôi C=C, làm mất màu dung dịch bromine (Br₂) ở điều kiện thường."
       },
       {
         id: "ch3",
         grade_id: "10",
         title: "Cấu tạo nguyên tử",
-        theory: "1. Các hạt cơ bản: Proton ($p$, mang điện $+1$), Neutron ($n$, không mang điện), Electron ($e$, mang điện $-1$).\n2. Nguyên tử trung hòa điện: $p = e = Z$. Số khối: $A = Z + N$."
+        theory: "1. Các hạt cơ bản: Proton (p, mang điện +1), Neutron (n, không mang điện), Electron (e, mang điện -1).\n2. Nguyên tử trung hòa điện: p = e = Z. Số khối: A = Z + N."
       },
       {
         id: "ch4",
@@ -141,23 +140,7 @@
         grade_id: "9",
         category: "Chuyên đề ôn thi",
         title: "Chuyên đề Hydrocarbon: Alkane – Alkene và ứng dụng thực tiễn",
-        summary: "So sánh cấu tạo phân tử, phản ứng thế của Methane ($CH_4$) và phản ứng cộng làm mất màu nước bromine của Ethylene ($C_2H_4$).",
-        link: ""
-      },
-      {
-        id: "doc3",
-        grade_id: "10",
-        category: "Công thức & Quy tắc",
-        title: "Sổ tay Cấu tạo nguyên tử & Bảng tuần hoàn các nguyên tố hóa học (Hóa 10)",
-        summary: "Quy tắc viết cấu hình electron nguyên tử, xác định vị trí nguyên tố (ô, chu kì, nhóm) và xu hướng biến đổi tính chất.",
-        link: ""
-      },
-      {
-        id: "doc4",
-        grade_id: "9",
-        category: "Hướng dẫn tra cứu",
-        title: "Bảng quy đổi danh pháp tiếng Anh IUPAC chuẩn GDPT 2018",
-        summary: "Tra cứu nhanh tên gọi mới của các nguyên tố (Iron, Copper, Aluminium...), oxide, acid, base và muối thường gặp.",
+        summary: "So sánh cấu tạo phân tử, phản ứng thế của Methane (CH₄) và phản ứng cộng làm mất màu nước bromine của Ethylene (C₂H₄).",
         link: ""
       }
     ];
@@ -169,65 +152,15 @@
         grade_id: "9",
         chapter: "Kim loại & Phi kim",
         type: "mcq",
-        content: "Kim loại nào sau đây tác dụng được với dung dịch sulfuric acid ($H_2SO_4$) loãng giải phóng khí hydrogen?",
-        options: ["Copper ($Cu$)", "Iron ($Fe$)", "Silver ($Ag$)", "Gold ($Au$)"],
-        correct_answer: "Iron ($Fe$)",
+        content: "Kim loại nào sau đây tác dụng được với dung dịch sulfuric acid (H₂SO₄) loãng giải phóng khí hydrogen?",
+        options: ["Copper (Cu)", "Iron (Fe)", "Silver (Ag)", "Gold (Au)"],
+        correct_answer: "Iron (Fe)",
         hints: [
           "Bước 1: Nhớ lại dãy hoạt động hóa học của kim loại.",
-          "Bước 2: Chỉ các kim loại đứng trước Hydrogen ($H$) mới phản ứng được với dung dịch acid loãng."
+          "Bước 2: Chỉ các kim loại đứng trước Hydrogen (H) mới phản ứng được với dung dịch acid loãng."
         ],
-        explanation: "Iron ($Fe$) đứng trước $H$ trong dãy hoạt động hóa học nên phản ứng được:\n$$Fe + H_2SO_4 \\rightarrow FeSO_4 + H_2\\uparrow$$\nCác kim loại $Cu, Ag, Au$ đứng sau $H$ nên không phản ứng.",
+        explanation: "Iron (Fe) đứng trước H trong dãy hoạt động hóa học nên phản ứng được:\nFe + H₂SO₄ → FeSO₄ + H₂↑\nCác kim loại Cu, Ag, Au đứng sau H nên không phản ứng.",
         search_count: 14
-      },
-      {
-        id: "q2",
-        question_code: "9HC-02",
-        grade_id: "9",
-        chapter: "Hợp chất hữu cơ - Hydrocarbon",
-        type: "true_false",
-        content: "Cho các phát biểu sau về alkane và alkene. Chọn Đúng hoặc Sai cho mỗi ý:",
-        options: [
-          "a) Methane ($CH_4$) là thành phần chính của khí thiên nhiên và khí mỏ dầu.",
-          "b) Ethylene ($C_2H_4$) làm mất màu dung dịch bromine ở điều kiện thường.",
-          "c) Đốt cháy hoàn toàn alkane luôn thu được số mol $CO_2$ lớn hơn số mol $H_2O$.",
-          "d) Phản ứng đặc trưng của methane với chlorine ngoài ánh sáng là phản ứng cộng."
-        ],
-        correct_answer: ["Đúng", "Đúng", "Sai", "Sai"],
-        hints: [
-          "Bước 1: Xem lại tính chất vật lí và nguồn tự nhiên của methane.",
-          "Bước 2: So sánh liên kết đơn (phản ứng thế) ở alkane và liên kết đôi (phản ứng cộng) ở alkene."
-        ],
-        explanation: "a) Đúng.\nb) Đúng do $C_2H_4$ có liên kết đôi kém bền.\nc) Sai vì đốt alkane thu được $n_{H_2O} > n_{CO_2}$.\nd) Sai vì methane tham gia phản ứng thế.",
-        search_count: 21
-      },
-      {
-        id: "q3",
-        question_code: "10NT-01",
-        grade_id: "10",
-        chapter: "Cấu tạo nguyên tử",
-        type: "short_answer",
-        content: "Nguyên tử Aluminium ($Al$) có số hiệu nguyên tử $Z = 13$ và số khối $A = 27$. Tổng số hạt proton, neutron và electron trong một nguyên tử $Al$ là bao nhiêu?",
-        options: [],
-        correct_answer: "40",
-        hints: [
-          "Bước 1: Trong nguyên tử trung hòa điện: $p = e = Z$.",
-          "Bước 2: Số khối $A = Z + N \\Rightarrow N = A - Z$."
-        ],
-        explanation: "- Số hạt proton và electron: $p = e = Z = 13$.\n- Số hạt neutron: $n = A - Z = 27 - 13 = 14$.\n- Tổng số hạt cơ bản: $13 + 13 + 14 = 40$ (hạt).",
-        search_count: 9
-      },
-      {
-        id: "q4",
-        question_code: "10LK-01",
-        grade_id: "10",
-        chapter: "Liên kết hóa học",
-        type: "fill_blank",
-        content: "Liên kết được hình thành bởi lực hút tĩnh điện giữa các ion mang điện tích trái dấu được gọi là liên kết ______.",
-        options: [],
-        correct_answer: "ion",
-        hints: ["Gợi ý: Tên loại liên kết trùng với tên của các hạt mang điện tạo nên nó."],
-        explanation: "Liên kết ion được hình thành bởi lực hút tĩnh điện giữa cation (ion dương) và anion (ion âm).",
-        search_count: 7
       },
       {
         id: "q5",
@@ -235,14 +168,14 @@
         grade_id: "9",
         chapter: "Kim loại & Phi kim",
         type: "essay",
-        content: "Hòa tan hoàn toàn $5,6\\text{ gam}$ Iron ($Fe$) vào dung dịch hydrochloric acid ($HCl$) dư. Viết phương trình hóa học và tính thể tích khí hydrogen thoát ra ở điều kiện chuẩn ($25^\\circ\\text{C}, 1\\text{ bar}$).",
+        content: "Hòa tan hoàn toàn 5,6 gam Iron (Fe) vào dung dịch hydrochloric acid (HCl) dư. Viết phương trình hóa học và tính thể tích khí hydrogen thoát ra ở điều kiện chuẩn (25°C, 1 bar).",
         options: [],
         correct_answer: "V = 2,479 lít",
         hints: [
-          "Bước 1: Tính số mol $Fe$ theo công thức $n = \\frac{m}{M}$ (với $M_{Fe} = 56$).",
-          "Bước 2: Ở điều kiện chuẩn ($25^\\circ\\text{C}, 1\\text{ bar}$), thể tích mol khí $V_m = 24,79\\text{ L/mol}$."
+          "Bước 1: Tính số mol Fe theo công thức n = m / M (với M(Fe) = 56).",
+          "Bước 2: Ở điều kiện chuẩn (25°C, 1 bar), thể tích mol khí Vₘ = 24,79 L/mol."
         ],
-        explanation: "Bước 1: Tính số mol Iron ($Fe$):\n$$n_{Fe} = \\frac{5,6}{56} = 0,1\\text{ (mol)}$$\nBước 2: Phương trình hóa học:\n$$Fe + 2HCl \\rightarrow FeCl_2 + H_2\\uparrow$$\nTheo PTHH: $n_{H_2} = n_{Fe} = 0,1\\text{ (mol)}$\nBước 3: Thể tích khí $H_2$ ở điều kiện chuẩn:\n$$V_{H_2} = 0,1 \\times 24,79 = 2,479\\text{ (lít)}$$",
+        explanation: "Bước 1: Tính số mol Iron (Fe):\n$$n_{Fe} = \\frac{5,6}{56} = 0,1\\text{ (mol)}$$\nBước 2: Phương trình hóa học:\nFe + 2HCl → FeCl₂ + H₂↑\nTheo PTHH: n(H₂) = n(Fe) = 0,1 (mol)\nBước 3: Thể tích khí H₂ ở điều kiện chuẩn:\nV(H₂) = 0,1 × 24,79 = 2,479 (lít)",
         search_count: 18
       }
     ];
@@ -258,29 +191,21 @@
       mode: "home",
       questions: [...SAMPLE_QUESTIONS],
       chaptersList: [...DEFAULT_CHAPTERS],
-      docs: JSON.parse(localStorage.getItem("thaychien_docs") || "null") || [...DEFAULT_DOCS],
-
-      // Trạng thái cổng lọc Ôn tập chuyên đề (Mặc định để trống, chưa chọn chuyên đề nào)
+      docs: [...DEFAULT_DOCS],
       practiceGrade: "9",
       practiceSelectedChapter: "",
       practiceTopicSearch: "",
-      practiceSectionTab: "exercises", // 'theory' hoặc 'exercises'
-
-      // Trạng thái Tra cứu
+      practiceSectionTab: "exercises",
       searchQuery: "",
       chapterFilter: "ALL",
       searchAllGrades: true,
       revealedHints: {},
       revealedSol: {},
-
-      // Trạng thái Làm bài & Thi
       answers: {},
       checkedPractice: {},
       examSubmitted: false,
       timeLeft: 900,
       timerInterval: null,
-
-      // Trạng thái Quản trị
       adminSubTab: "single"
     };
 
@@ -318,6 +243,155 @@
       }
     }
 
+    // =========================================================================
+    // BỘ CÔNG CỤ SOẠN THẢO HÓA HỌC (CHỈ SỐ DƯỚI/TRÊN, MŨI TÊN t°, LỌC WORD)
+    // =========================================================================
+    const SUB_MAP = { "0":"₀", "1":"₁", "2":"₂", "3":"₃", "4":"₄", "5":"₅", "6":"₆", "7":"₇", "8":"₈", "9":"₉", "+":"₊", "-":"₋", "(":"₍", ")":"₎", "n":"ₙ", "x":"ₓ", "y":"ᵧ" };
+    const SUP_MAP = { "0":"⁰", "1":"¹", "2":"²", "3":"³", "4":"⁴", "5":"⁵", "6":"⁶", "7":"⁷", "8":"⁸", "9":"⁹", "+":"⁺", "-":"⁻", "n":"ⁿ", "o":"°" };
+
+    // Bôi đen chữ/số rồi bấm nút để biến thành chỉ số nhỏ (VD: H2SO4 -> bôi đen 2 -> H₂SO₄)
+    function applySubscript(targetId) {
+      const el = document.getElementById(targetId);
+      if (!el) return;
+      const start = el.selectionStart;
+      const end = el.selectionEnd;
+      if (start === end) {
+        alert("Thầy hãy gõ số bình thường (VD: H2SO4), sau đó bôi đen số 2 hoặc số 4 rồi bấm nút [X₂] này để biến thành chữ nhỏ!");
+        el.focus();
+        return;
+      }
+      const selected = el.value.substring(start, end);
+      const converted = selected.split("").map((ch) => SUB_MAP[ch] || ch).join("");
+      el.value = el.value.substring(0, start) + converted + el.value.substring(end);
+      el.focus();
+      el.selectionStart = el.selectionEnd = start + converted.length;
+      updateLivePreview(targetId);
+    }
+
+    // Bôi đen số/dấu rồi bấm nút để biến thành chỉ số trên (VD: Fe3+ -> Fe³⁺)
+    function applySuperscript(targetId) {
+      const el = document.getElementById(targetId);
+      if (!el) return;
+      const start = el.selectionStart;
+      const end = el.selectionEnd;
+      if (start === end) {
+        alert("Thầy hãy bôi đen số hoặc dấu (+, -) cần đưa lên mũ trên rồi bấm nút [X²] này!");
+        el.focus();
+        return;
+      }
+      const selected = el.value.substring(start, end);
+      const converted = selected.split("").map((ch) => SUP_MAP[ch] || ch).join("");
+      el.value = el.value.substring(0, start) + converted + el.value.substring(end);
+      el.focus();
+      el.selectionStart = el.selectionEnd = start + converted.length;
+      updateLivePreview(targetId);
+    }
+
+    // Tự động chuyển đổi nhanh công thức hóa học phổ biến trong văn bản
+    function autoFormatChemInBox(targetId) {
+      const el = document.getElementById(targetId);
+      if (!el) return;
+      let text = el.value;
+      // Chuyển các chỉ số đứng sau nguyên tố hóa học (VD: H2O -> H₂O, H2SO4 -> H₂SO₄, Fe2O3 -> Fe₂O₃)
+      text = text.replace(/([A-Z][a-z]?)(\d+)/g, (m, elem, digits) => {
+        const subDigits = digits.split("").map((d) => SUB_MAP[d] || d).join("");
+        return elem + subDigits;
+      });
+      // Chuyển dấu ngoặc nhóm nguyên tử (OH)2, (SO4)3 -> (OH)₂, (SO₄)₃
+      text = text.replace(/\)(\d+)/g, (m, digits) => {
+        const subDigits = digits.split("").map((d) => SUB_MAP[d] || d).join("");
+        return ")" + subDigits;
+      });
+      el.value = text;
+      updateLivePreview(targetId);
+    }
+
+    // Dọn sạch ký hiệu rác khi copy từ Word / Equation / MathType
+    function cleanWordPaste(targetId) {
+      const el = document.getElementById(targetId);
+      if (!el) return;
+      let s = el.value;
+      // Xóa các thẻ XML / Equation rác nếu có
+      s = s.replace(/<[^>]*>/g, "");
+      s = s.replace(/[\u200B-\u200D\uFEFF\uFFFC]/g, "");
+      // Chuẩn hóa khoảng trắng thừa và dấu mũi tên
+      s = s.replace(/-->|->/g, " → ");
+      s = s.replace(/<=>|<->/g, " ⇌ ");
+      s = s.replace(/[ \t]{2,}/g, " ");
+      el.value = s;
+      updateLivePreview(targetId);
+    }
+
+    function insertSnippet(targetId, snippet) {
+      const el = document.getElementById(targetId);
+      if (!el) return;
+      const start = el.selectionStart;
+      const end = el.selectionEnd;
+      const text = el.value;
+      el.value = text.substring(0, start) + snippet + text.substring(end);
+      el.focus();
+      el.selectionStart = el.selectionEnd = start + snippet.length;
+      updateLivePreview(targetId);
+    }
+
+    function updateLivePreview(targetId) {
+      const el = document.getElementById(targetId);
+      const previewBox = document.getElementById(targetId + "-preview");
+      if (!el || !previewBox) return;
+      if (!el.value.trim()) {
+        previewBox.innerHTML = `<span class="text-slate-400 italic">Nội dung sau khi định dạng sẽ hiện trực tiếp tại đây...</span>`;
+        return;
+      }
+      previewBox.innerHTML = formatRichText(el.value);
+      if (typeof renderMathInElement === "function") {
+        renderMathInElement(previewBox, {
+          delimiters: [
+            { left: "$$", right: "$$", display: true },
+            { left: "$", right: "$", display: false }
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    function renderChemToolbar(targetId) {
+      return `
+        <div class="flex flex-wrap items-center gap-1.5 bg-slate-100 p-2 rounded-t-lg border border-b-0 border-slate-300 text-xs">
+          <button type="button" onclick="applySubscript('${targetId}')" title="Bôi đen số rồi bấm để tạo chỉ số nhỏ dưới"
+            class="px-2.5 py-1 bg-white hover:bg-teal-600 hover:text-white border border-slate-300 rounded font-bold shadow-sm">
+            X₂ (Chỉ số dưới)
+          </button>
+          <button type="button" onclick="applySuperscript('${targetId}')" title="Bôi đen số/dấu rồi bấm để tạo chỉ số trên"
+            class="px-2.5 py-1 bg-white hover:bg-teal-600 hover:text-white border border-slate-300 rounded font-bold shadow-sm">
+            X² (Chỉ số trên)
+          </button>
+          <button type="button" onclick="autoFormatChemInBox('${targetId}')" title="Tự động chuyển tất cả H2O, H2SO4, Fe2O3 thành chữ nhỏ"
+            class="px-2.5 py-1 bg-teal-700 text-white hover:bg-teal-800 rounded font-semibold shadow-sm">
+            ✨ Tự làm nhỏ công thức
+          </button>
+          <span class="text-slate-300">|</span>
+          <button type="button" onclick="insertSnippet('${targetId}', ' → ')" class="px-2 py-1 bg-white hover:bg-amber-100 border rounded font-bold">→</button>
+          <button type="button" onclick="insertSnippet('${targetId}', ' $\\xrightarrow{t^\\circ}$ ')" title="Mũi tên có nhiệt độ t° ở trên"
+            class="px-2.5 py-1 bg-amber-100 hover:bg-amber-200 text-amber-950 border border-amber-300 rounded font-bold">
+            → (có t° ở trên)
+          </button>
+          <button type="button" onclick="insertSnippet('${targetId}', ' $\\xrightarrow{xt, t^\\circ}$ ')" title="Mũi tên có xúc tác, nhiệt độ ở trên"
+            class="px-2 py-1 bg-white hover:bg-amber-100 border rounded font-semibold">
+            → (xt, t°)
+          </button>
+          <button type="button" onclick="insertSnippet('${targetId}', ' ⇌ ')" class="px-2 py-1 bg-white hover:bg-amber-100 border rounded font-bold">⇌</button>
+          <button type="button" onclick="insertSnippet('${targetId}', '↑')" class="px-2 py-1 bg-white hover:bg-amber-100 border rounded font-bold">↑</button>
+          <button type="button" onclick="insertSnippet('${targetId}', '↓')" class="px-2 py-1 bg-white hover:bg-amber-100 border rounded font-bold">↓</button>
+          <button type="button" onclick="insertSnippet('${targetId}', '°C')" class="px-2 py-1 bg-white hover:bg-amber-100 border rounded font-semibold">°C</button>
+          <button type="button" onclick="insertSnippet('${targetId}', '$$\\frac{tử}{mẫu}$$')" class="px-2 py-1 bg-white hover:bg-amber-100 border rounded font-semibold">Phân số</button>
+          <button type="button" onclick="cleanWordPaste('${targetId}')" title="Xóa ký tự lạ khi dán từ Word"
+            class="ml-auto px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded font-semibold">
+            🧹 Lọc ký hiệu lạ Word
+          </button>
+        </div>
+      `;
+    }
+
     function normalizeText(str) {
       if (!str) return "";
       const subMap = { "₀":"0","₁":"1","₂":"2","₃":"3","₄":"4","₅":"5","₆":"6","₇":"7","₈":"8","₉":"9" };
@@ -341,7 +415,6 @@
       return state.user && state.user.role === "admin";
     }
 
-    // Tổng hợp danh sách chuyên đề theo khối lớp (kết hợp từ bảng chapters và các câu hỏi hiện có)
     function getAvailableChaptersForGrade(gradeId) {
       const map = new Map();
       state.chaptersList
@@ -405,7 +478,7 @@
           });
         }
       } else {
-        document.title = "Hóa Học Thầy Chiến (v4.7) - Cổng Học Liệu & Ôn Tập Chuyên Đề";
+        document.title = "Hóa Học Thầy Chiến (v4.8) - Cổng Học Liệu & Ôn Tập Chuyên Đề";
         if (schemaEl) {
           schemaEl.textContent = JSON.stringify({
             "@context": "https://schema.org",
@@ -450,6 +523,9 @@
 
         const { data: qData } = await db.from("questions").select("*").order("created_at", { ascending: false });
         if (qData && qData.length > 0) state.questions = qData;
+
+        const { data: dData } = await db.from("documents").select("*").order("created_at", { ascending: false });
+        if (dData && dData.length > 0) state.docs = dData;
       } catch (e) { console.log(e); }
 
       applyUrlQueryParam();
@@ -595,7 +671,6 @@
     function selectMode(m) {
       state.mode = m;
       if (m === "practice") {
-        // Khi mở vào Ôn tập chuyên đề, reset lựa chọn chuyên đề để hiện cổng chọn sạch sẽ
         state.practiceGrade = state.selectedGrade;
         state.practiceSelectedChapter = "";
         state.practiceTopicSearch = "";
@@ -702,9 +777,6 @@
       renderMathTypeset();
     }
 
-    // =========================================================================
-    // TRANG CHỦ PORTAL MỞ ĐẦU
-    // =========================================================================
     function renderHomeView() {
       const currentGradeObj = state.grades.find((g) => g.id === state.selectedGrade) || state.grades[0];
       const totalQ = state.questions.length;
@@ -819,46 +891,10 @@
               </div>
             </div>
           </section>
-
-          <section class="grid md:grid-cols-3 gap-4">
-            <div class="md:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 space-y-3">
-              <h3 class="font-bold text-base text-teal-900 flex items-center gap-2">
-                <span>📌</span> Quy chuẩn học tập & Tra cứu trên hệ thống
-              </h3>
-              <ul class="text-xs sm:text-sm text-slate-600 space-y-2 leading-relaxed">
-                <li>• <strong>Danh pháp hóa học:</strong> Sử dụng thống nhất tên gọi tiếng Anh theo chuẩn IUPAC (<em>Iron, Copper, Aluminium, sulfuric acid, sodium hydroxide...</em>).</li>
-                <li>• <strong>Hằng số tính toán:</strong> Thể tích mol chất khí ở điều kiện chuẩn ($25^\circ\text{C}, 1\text{ bar}$) lấy giá trị $V_m = 24,79\text{ L/mol}$.</li>
-                <li>• <strong>Cách tra cứu nhanh nhất:</strong> Mỗi bài tập trên phiếu học tập đều có gắn <strong>Mã câu hỏi</strong> ở đầu câu (ví dụ: <code class="bg-slate-100 px-1.5 py-0.5 rounded font-mono font-bold text-teal-800">[9KL-01]</code>). Học sinh chỉ cần nhập đúng mã này vào ô tìm kiếm để xem hướng dẫn từng bước.</li>
-              </ul>
-            </div>
-
-            <div class="bg-amber-50/80 p-6 rounded-2xl border border-amber-200 flex flex-col justify-between space-y-4">
-              <div class="space-y-2">
-                <h3 class="font-bold text-base text-amber-900">🎓 Dành cho Học sinh & Giáo viên</h3>
-                <p class="text-xs text-amber-950/80 leading-relaxed">
-                  Học sinh có thể tra cứu tự do hoặc đăng ký tài khoản bằng <strong>Mã lớp</strong> của Thầy Chiến để lưu lịch sử làm bài.
-                </p>
-              </div>
-              <div class="flex flex-col gap-2">
-                ${isAdmin() ? `
-                  <button onclick="selectMode('admin')" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm">
-                    🛡️ Mở trang Quản trị Giáo viên
-                  </button>
-                ` : `
-                  <button onclick="openAuthModal()" class="w-full bg-teal-800 hover:bg-teal-900 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm">
-                    Đăng nhập / Đăng ký tài khoản
-                  </button>
-                `}
-              </div>
-            </div>
-          </section>
         </div>
       `;
     }
 
-    // =========================================================================
-    // MỤC 2: ÔN TẬP CHUYÊN ĐỀ (CỔNG LỌC 2 BƯỚC + TÁCH LÝ THUYẾT & BÀI TẬP)
-    // =========================================================================
     function onChangePracticeGrade(newGradeId) {
       state.practiceGrade = newGradeId;
       state.selectedGrade = newGradeId;
@@ -887,7 +923,6 @@
 
       return `
         <div class="max-w-5xl mx-auto space-y-5">
-          <!-- CỔNG LỌC 2 BƯỚC GỌN GÀNG (LỚP + CHUYÊN ĐỀ / BÀI HỌC) -->
           <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
             <div class="flex flex-wrap justify-between items-center gap-2 border-b border-slate-100 pb-3">
               <div>
@@ -898,7 +933,6 @@
             </div>
 
             <div class="grid sm:grid-cols-12 gap-3">
-              <!-- Cổng lọc 1: Chọn Lớp -->
               <div class="sm:col-span-3">
                 <label class="block text-xs font-bold text-slate-600 uppercase mb-1">1. Chọn Khối lớp</label>
                 <select onchange="onChangePracticeGrade(this.value)"
@@ -909,7 +943,6 @@
                 </select>
               </div>
 
-              <!-- Cổng lọc 2: Xổ xuống Chuyên đề / Bài -->
               <div class="sm:col-span-5">
                 <label class="block text-xs font-bold text-slate-600 uppercase mb-1">2. Chọn Chuyên đề / Bài học</label>
                 <select onchange="onSelectPracticeChapter(this.value)"
@@ -922,7 +955,6 @@
                 </select>
               </div>
 
-              <!-- Ô tìm nhanh tên chuyên đề -->
               <div class="sm:col-span-4">
                 <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Tìm nhanh chuyên đề</label>
                 <input type="text" value="${esc(state.practiceTopicSearch)}"
@@ -933,7 +965,6 @@
             </div>
           </div>
 
-          <!-- TRẠNG THÁI CHƯA CHỌN CHUYÊN ĐỀ: CHỈ HIỆN DANH MỤC THẺ CHUYÊN ĐỀ GỌN GÀNG, KHÔNG ĐỔ CÂU HỎI -->
           ${!state.practiceSelectedChapter ? `
             <div class="bg-white p-6 rounded-2xl border border-slate-200 space-y-4">
               <div class="flex items-center justify-between">
@@ -968,7 +999,6 @@
               `}
             </div>
           ` : `
-            <!-- ĐÃ CHỌN 1 CHUYÊN ĐỀ CỤ THỂ: HIỂN THỊ 2 PHẦN (LÝ THUYẾT & BÀI TẬP) -->
             <div class="space-y-4">
               <div class="bg-teal-900 text-white p-5 rounded-2xl shadow-sm flex flex-wrap justify-between items-center gap-3">
                 <div>
@@ -995,7 +1025,6 @@
                 </div>
               </div>
 
-              <!-- TAB LÝ THUYẾT CHUYÊN ĐỀ -->
               ${state.practiceSectionTab === "theory" ? `
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
                   <div class="flex justify-between items-center border-b pb-3">
@@ -1019,7 +1048,6 @@
                   `}
                 </div>
               ` : `
-                <!-- TAB BÀI TẬP CHUYÊN ĐỀ -->
                 <div class="space-y-4">
                   ${topicQuestions.length === 0 ? `
                     <div class="bg-white p-8 rounded-2xl border border-slate-200 text-center space-y-2">
@@ -1109,9 +1137,6 @@
       `;
     }
 
-    // =========================================================================
-    // MỤC 3: KIỂM TRA / THI THỬ
-    // =========================================================================
     function setMcqAnswer(qid, opt) {
       state.answers[qid] = opt;
       renderAll();
@@ -1181,9 +1206,6 @@
       `;
     }
 
-    // =========================================================================
-    // MỤC 1: TÌM KIẾM ĐÁP ÁN & LỜI GIẢI
-    // =========================================================================
     function updateSearch(val) {
       state.searchQuery = val;
       const url = new URL(window.location.href);
@@ -1391,9 +1413,6 @@
       `;
     }
 
-    // =========================================================================
-    // MỤC 4: KHO TÀI LIỆU
-    // =========================================================================
     function renderDocsView() {
       const gradeDocs = state.docs.filter((d) => d.grade_id === state.selectedGrade || d.grade_id === "ALL");
       return `
@@ -1438,33 +1457,32 @@
       `;
     }
 
-    function addNewDoc(e) {
+    async function addNewDoc(e) {
       e.preventDefault();
       if (!isAdmin()) return;
-      const newDoc = {
-        id: "doc_" + Date.now(),
+      const payload = {
         grade_id: document.getElementById("doc-grade").value,
         category: document.getElementById("doc-cat").value.trim(),
         title: document.getElementById("doc-title").value.trim(),
         summary: document.getElementById("doc-summary").value.trim(),
         link: document.getElementById("doc-link").value.trim()
       };
-      state.docs.unshift(newDoc);
-      localStorage.setItem("thaychien_docs", JSON.stringify(state.docs));
-      alert("Đã đăng tài liệu mới lên Kho Tài liệu!");
-      renderAll();
+      const { data, error } = await db.from("documents").insert(payload).select();
+      if (error) return alert("Lỗi lưu tài liệu lên Supabase: " + error.message);
+      if (data) {
+        state.docs.unshift(data[0]);
+        alert("Đã lưu vĩnh viễn tài liệu lên hệ thống!");
+        renderAll();
+      }
     }
 
-    function deleteDoc(id) {
-      if (!isAdmin() || !confirm("Xóa tài liệu này?")) return;
+    async function deleteDoc(id) {
+      if (!isAdmin() || !confirm("Thầy chắc chắn muốn xóa tài liệu này?")) return;
+      await db.from("documents").delete().eq("id", id);
       state.docs = state.docs.filter((d) => d.id !== id);
-      localStorage.setItem("thaychien_docs", JSON.stringify(state.docs));
       renderAll();
     }
 
-    // =========================================================================
-    // MỤC QUẢN TRỊ ĐỘC QUYỀN CỦA GIÁO VIÊN (THÊM CHUYÊN ĐỀ / BÀI + CÂU HỎI)
-    // =========================================================================
     function autoExtractCode(textarea) {
       const val = textarea.value;
       const match = val.trim().match(/^\[([A-Za-z0-9-_]+)\]\s*(.*)$/s);
@@ -1473,17 +1491,7 @@
         codeInput.value = match[1].toUpperCase();
         textarea.value = match[2].trim();
       }
-    }
-
-    function insertSnippet(targetId, snippet) {
-      const el = document.getElementById(targetId);
-      if (!el) return;
-      const start = el.selectionStart;
-      const end = el.selectionEnd;
-      const text = el.value;
-      el.value = text.substring(0, start) + snippet + text.substring(end);
-      el.focus();
-      el.selectionStart = el.selectionEnd = start + snippet.length;
+      updateLivePreview("q-content");
     }
 
     function syncAdminChapterOptions(gradeSelectId, chapterSelectId) {
@@ -1518,14 +1526,12 @@
       const payload = { grade_id: gradeId, title, theory };
       const { data, error } = await db.from("chapters").insert(payload).select();
       if (error) {
-        // Dự phòng nếu chưa chạy SQL tạo bảng chapters
-        state.chaptersList.push({ id: "ch_" + Date.now(), ...payload });
-        alert("Đã thêm chuyên đề vào bộ nhớ tạm (Thầy nhớ chạy lệnh SQL tạo bảng chapters trên Supabase để lưu vĩnh viễn nhé!).");
+        alert("Lỗi lưu chuyên đề lên Supabase: " + error.message);
       } else if (data) {
         state.chaptersList.push(data[0]);
-        alert(`Đã lưu thành công chuyên đề "${title}" vào hệ thống!`);
+        alert(`Đã lưu vĩnh viễn chuyên đề "${title}" lên hệ thống!`);
+        renderAll();
       }
-      renderAll();
     }
 
     async function deleteChapterItem(id, title) {
@@ -1677,12 +1683,11 @@
             </button>
           </div>
 
-          <!-- TAB THÊM CHUYÊN ĐỀ / BÀI HỌC & TÓM TẮT LÝ THUYẾT -->
           ${state.adminSubTab === "chapters" ? `
             <div class="bg-white p-6 rounded-xl shadow-sm border-2 border-teal-600/30 space-y-5">
               <div class="border-b pb-3">
                 <h2 class="font-bold text-lg text-teal-800">Tạo Chuyên đề / Bài học mới (Kèm Lý thuyết trọng tâm)</h2>
-                <p class="text-xs text-slate-500">Chuyên đề tạo ở đây sẽ hiển thị ngay trong cổng chọn <strong>Ôn tập chuyên đề</strong> của học sinh và danh sách chọn khi nhập câu hỏi.</p>
+                <p class="text-xs text-slate-500">Mẹo: Gõ H2SO4 rồi bấm nút <strong>✨ Tự làm nhỏ công thức</strong> để tự động biến thành H₂SO₄.</p>
               </div>
 
               <form onsubmit="submitAddChapter(event)" class="space-y-4">
@@ -1695,23 +1700,21 @@
                   </div>
                   <div class="sm:col-span-2">
                     <label class="block text-xs font-semibold mb-1">Tên Chuyên đề / Bài học (Bắt buộc)</label>
-                    <input id="ch-title" required placeholder="VD: Bài 18: Tính chất chung của kim loại (hoặc Chuyên đề Acid - Base)"
+                    <input id="ch-title" required placeholder="VD: Bài 18: Tính chất chung của kim loại"
                       class="w-full border rounded-lg p-2.5 text-sm" />
                   </div>
                 </div>
 
-                <div class="space-y-1.5">
-                  <div class="flex flex-wrap items-center justify-between gap-2">
-                    <label class="block text-xs font-semibold">Nội dung Tóm tắt Lý thuyết & Công thức (Hỗ trợ LaTeX / MathType)</label>
-                    <div class="flex flex-wrap gap-1 text-xs">
-                      <button type="button" onclick="insertSnippet('ch-theory', '\\rightarrow')" class="px-2 py-0.5 bg-slate-100 hover:bg-teal-100 border rounded font-mono">→</button>
-                      <button type="button" onclick="insertSnippet('ch-theory', '\\xrightarrow{t^\\circ}')" class="px-2 py-0.5 bg-slate-100 hover:bg-teal-100 border rounded font-mono">→ (t°)</button>
-                      <button type="button" onclick="insertSnippet('ch-theory', '\n$$ ... $$\n')" class="px-2 py-0.5 bg-slate-100 hover:bg-teal-100 border rounded font-mono">Công thức dòng riêng</button>
-                    </div>
+                <div>
+                  <label class="block text-xs font-semibold mb-1">Nội dung Tóm tắt Lý thuyết & Công thức</label>
+                  ${renderChemToolbar("ch-theory")}
+                  <textarea id="ch-theory" rows="5" oninput="updateLivePreview('ch-theory')"
+                    placeholder="Nhập tóm tắt lý thuyết trọng tâm (nhấn Enter để xuống dòng)..."
+                    class="w-full border border-slate-300 rounded-b-lg p-3 text-sm"></textarea>
+                  <div class="mt-2 p-3 bg-amber-50/50 border border-amber-200 rounded-lg text-sm">
+                    <div class="text-[11px] font-bold text-amber-800 uppercase mb-1">👁️ Xem trước hiển thị thực tế:</div>
+                    <div id="ch-theory-preview"><span class="text-slate-400 italic">Nội dung sau khi định dạng sẽ hiện trực tiếp tại đây...</span></div>
                   </div>
-                  <textarea id="ch-theory" rows="5"
-                    placeholder="Nhập tóm tắt lý thuyết trọng tâm của chuyên đề hoặc bài học này (nhấn Enter để xuống dòng)..."
-                    class="w-full border rounded-lg p-3 text-sm"></textarea>
                 </div>
 
                 <button type="submit" class="bg-teal-700 text-white font-bold px-5 py-2.5 rounded-lg hover:bg-teal-800 shadow-sm">
@@ -1736,13 +1739,12 @@
             </div>
           ` : ""}
 
-          <!-- TAB NHẬP TỪNG CÂU HỎI -->
           ${state.adminSubTab === "single" ? `
             <div class="bg-white p-6 rounded-xl shadow-sm border-2 border-teal-600/30 space-y-4">
               <div class="border-b pb-3 space-y-1">
                 <h2 class="font-bold text-lg text-teal-800">Thêm câu hỏi mới & Gắn Mã tra cứu</h2>
                 <p class="text-xs text-slate-600">
-                  Nhấn <kbd class="px-1.5 py-0.5 bg-slate-100 border rounded">Enter</kbd> để xuống dòng từng bước. Công thức Toán/Hóa đặt trong <code class="bg-slate-100 px-1 rounded">$ ... $</code> hoặc <code class="bg-slate-100 px-1 rounded">$$ ... $$</code>.
+                  Mẹo: Gõ công thức bình thường (VD: <code class="bg-slate-100 px-1 rounded">Fe2O3 + 3H2SO4</code>) rồi bấm nút <strong>✨ Tự làm nhỏ công thức</strong>, hoặc bôi đen số cần thu nhỏ rồi bấm <strong>X₂</strong>.
                 </p>
               </div>
               <form onsubmit="submitSingleQuestion(event)" class="space-y-4">
@@ -1779,9 +1781,14 @@
 
                 <div>
                   <label class="block text-xs font-semibold mb-1">Nội dung câu hỏi</label>
+                  ${renderChemToolbar("q-content")}
                   <textarea id="q-content" required rows="2" oninput="autoExtractCode(this)"
-                    placeholder="Nhập hoặc dán đề bài (có thể dán kèm [MÃ] ở đầu)..."
-                    class="w-full border rounded-lg p-2.5 text-sm"></textarea>
+                    placeholder="Nhập đề bài (có thể dán kèm [MÃ] ở đầu)..."
+                    class="w-full border border-slate-300 rounded-b-lg p-2.5 text-sm"></textarea>
+                  <div class="mt-1.5 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm">
+                    <div class="text-[10px] font-bold text-slate-500 uppercase mb-0.5">👁️ Xem trước đề bài:</div>
+                    <div id="q-content-preview"><span class="text-slate-400 italic">Đề bài sau khi định dạng sẽ hiện tại đây...</span></div>
+                  </div>
                 </div>
 
                 <div class="grid sm:grid-cols-2 gap-2">
@@ -1806,21 +1813,16 @@
                   </div>
                 </div>
 
-                <div class="space-y-1.5">
-                  <div class="flex flex-wrap items-center justify-between gap-2">
-                    <label class="block text-xs font-semibold">Lời giải chi tiết (Nhấn Enter để xuống dòng từng bước)</label>
-                    <div class="flex flex-wrap gap-1 text-xs">
-                      <button type="button" onclick="insertSnippet('q-exp', '$\\frac{m}{M}$')" class="px-2 py-0.5 bg-slate-100 hover:bg-teal-100 border rounded font-mono">Phân số</button>
-                      <button type="button" onclick="insertSnippet('q-exp', '\\rightarrow')" class="px-2 py-0.5 bg-slate-100 hover:bg-teal-100 border rounded font-mono">→</button>
-                      <button type="button" onclick="insertSnippet('q-exp', '\\xrightarrow{t^\\circ}')" class="px-2 py-0.5 bg-slate-100 hover:bg-teal-100 border rounded font-mono">→ (t°)</button>
-                      <button type="button" onclick="insertSnippet('q-exp', '\\uparrow')" class="px-2 py-0.5 bg-slate-100 hover:bg-teal-100 border rounded font-mono">↑</button>
-                      <button type="button" onclick="insertSnippet('q-exp', '\\downarrow')" class="px-2 py-0.5 bg-slate-100 hover:bg-teal-100 border rounded font-mono">↓</button>
-                      <button type="button" onclick="insertSnippet('q-exp', '\n$$ ... $$\n')" class="px-2 py-0.5 bg-slate-100 hover:bg-teal-100 border rounded font-mono">Công thức dòng riêng</button>
-                    </div>
+                <div>
+                  <label class="block text-xs font-semibold mb-1">Lời giải chi tiết (Nhấn Enter để xuống dòng từng bước)</label>
+                  ${renderChemToolbar("q-exp")}
+                  <textarea id="q-exp" rows="5" oninput="updateLivePreview('q-exp')"
+                    placeholder="Bước 1: Tính số mol...\nBước 2: Phương trình hóa học..."
+                    class="w-full border border-slate-300 rounded-b-lg p-2.5 text-sm"></textarea>
+                  <div class="mt-1.5 p-3 bg-teal-50/60 border border-teal-200 rounded-lg text-sm">
+                    <div class="text-[10px] font-bold text-teal-800 uppercase mb-1">👁️ Xem trước lời giải chi tiết:</div>
+                    <div id="q-exp-preview"><span class="text-slate-400 italic">Lời giải chi tiết sẽ hiện trực tiếp tại đây...</span></div>
                   </div>
-                  <textarea id="q-exp" rows="5"
-                    placeholder="Bước 1: Tính số mol...\n$$n = \\frac{5,6}{56} = 0,1\\text{ (mol)}$$\nBước 2: Phương trình hóa học..."
-                    class="w-full border rounded-lg p-2.5 text-sm font-mono"></textarea>
                 </div>
 
                 <button type="submit" class="bg-teal-700 text-white font-bold px-5 py-2.5 rounded-lg hover:bg-teal-800 shadow-sm">
@@ -1830,7 +1832,6 @@
             </div>
           ` : ""}
 
-          <!-- TAB NHẬP HÀNG LOẠT -->
           ${state.adminSubTab === "bulk" ? `
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
               <div>
@@ -1857,7 +1858,7 @@
                   </div>
                 </div>
                 <textarea id="bulk-text" required rows="6"
-                  placeholder="9KL-10 | Hòa tan 2,4g Mg vào HCl dư thu được bao nhiêu lít $H_2$ (đkc)? | 2,479 lít | Tính $n_{Mg} = 0,1\\text{ mol}$ | Bước 1: $n_{Mg} = 0,1\\text{ mol}$\\nBước 2: $V_{H_2} = 0,1 \\times 24,79 = 2,479\\text{ lít}$"
+                  placeholder="9KL-10 | Hòa tan 2,4g Mg vào HCl dư thu được bao nhiêu lít H₂ (đkc)? | 2,479 lít | Tính n(Mg) = 0,1 mol | Bước 1: n(Mg) = 0,1 mol\\nBước 2: V(H₂) = 0,1 × 24,79 = 2,479 lít"
                   class="w-full border rounded-lg p-3 text-sm font-mono"></textarea>
                 <button type="submit" class="bg-teal-700 text-white font-bold px-5 py-2.5 rounded-lg hover:bg-teal-800">
                   ⚡ Nạp toàn bộ danh sách lên hệ thống
@@ -1866,7 +1867,6 @@
             </div>
           ` : ""}
 
-          <!-- TAB ĐĂNG TÀI LIỆU -->
           ${state.adminSubTab === "docs" ? `
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
               <h2 class="font-bold text-lg text-teal-800">Đăng Tài liệu / Chuyên đề mới lên Kho Tài liệu</h2>
@@ -1889,8 +1889,9 @@
                   <input id="doc-title" required placeholder="VD: Chuyên đề Kim loại & Dãy hoạt động hóa học (KHTN 9)" class="w-full border rounded-lg p-2 text-sm" />
                 </div>
                 <div>
-                  <label class="block text-xs font-semibold mb-1">Nội dung tóm tắt / Kiến thức trọng tâm (Hỗ trợ LaTeX)</label>
-                  <textarea id="doc-summary" required rows="3" placeholder="Tóm tắt nội dung chính hoặc công thức quan trọng..." class="w-full border rounded-lg p-2.5 text-sm"></textarea>
+                  <label class="block text-xs font-semibold mb-1">Nội dung tóm tắt / Kiến thức trọng tâm</label>
+                  ${renderChemToolbar("doc-summary")}
+                  <textarea id="doc-summary" required rows="3" oninput="updateLivePreview('doc-summary')" placeholder="Tóm tắt nội dung chính hoặc công thức quan trọng..." class="w-full border border-slate-300 rounded-b-lg p-2.5 text-sm"></textarea>
                 </div>
                 <div>
                   <label class="block text-xs font-semibold mb-1">Đường link tải tệp (Google Drive / PDF - Tùy chọn)</label>
@@ -1903,7 +1904,6 @@
             </div>
           ` : ""}
 
-          <!-- TAB MỞ RỘNG KHỐI LỚP -->
           ${state.adminSubTab === "grades" ? `
             <div class="bg-white p-5 rounded-xl shadow-sm border border-amber-200">
               <h2 class="font-bold text-base text-amber-900 mb-3">Quản lý & Mở rộng Khối lớp</h2>
