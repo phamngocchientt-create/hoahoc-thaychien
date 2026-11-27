@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hóa Học Thầy Chiến (v4.3) - Tra cứu Mã câu hỏi & Luyện thi</title>
+  <meta name="robots" content="index, follow" />
+  <meta name="description" content="Hệ thống tra cứu lời giải, gợi ý tư duy và luyện thi Hóa học chuẩn chương trình GDPT 2018 (Danh pháp IUPAC) - Hóa Học Thầy Chiến." />
+  <title>Hóa Học Thầy Chiến (v4.4) - Tra cứu Lời giải & Luyện thi Hóa học</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script id="qa-schema" type="application/ld+json">{}</script>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
 
@@ -13,13 +16,13 @@
   <header class="bg-teal-800 text-white shadow-md">
     <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-3">
-        <div class="bg-amber-400 text-teal-950 font-extrabold px-3 py-1.5 rounded-lg text-lg">H₂O</div>
+        <a href="?" class="bg-amber-400 text-teal-950 font-extrabold px-3 py-1.5 rounded-lg text-lg">H₂O</a>
         <div>
           <div class="flex items-center gap-2">
             <h1 class="font-bold text-lg leading-tight">HÓA HỌC THẦY CHIẾN</h1>
-            <span class="text-[11px] bg-teal-950 text-amber-300 font-mono px-2 py-0.5 rounded">v4.3</span>
+            <span class="text-[11px] bg-teal-950 text-amber-300 font-mono px-2 py-0.5 rounded">v4.4</span>
           </div>
-          <p class="text-xs text-teal-200">Tra cứu theo Mã câu hỏi & Từ khóa • Luyện tập • Kiểm tra</p>
+          <p class="text-xs text-teal-200">Tra cứu lời giải chuẩn IUPAC • Luyện tập • Kiểm tra trực tuyến</p>
         </div>
       </div>
 
@@ -37,6 +40,14 @@
 
   <!-- MAIN CONTENT -->
   <main id="app-main" class="max-w-5xl w-full mx-auto px-4 py-6 flex-1"></main>
+
+  <!-- FOOTER SEO & MỤC LỤC CÔNG KHAI -->
+  <footer class="bg-white border-t border-slate-200 mt-10 py-6 text-xs text-slate-500">
+    <div class="max-w-5xl mx-auto px-4 space-y-2">
+      <p class="font-semibold text-slate-700">Ngân hàng câu hỏi & Hướng dẫn giải Hóa học - Thầy Chiến (Chuẩn GDPT 2018)</p>
+      <div id="public-index-links" class="flex flex-wrap gap-2"></div>
+    </div>
+  </footer>
 
   <!-- AUTH MODAL -->
   <div id="auth-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
@@ -71,9 +82,6 @@
   </div>
 
   <script>
-    // =========================================================================
-    // KẾT NỐI SUPABASE DỰ ÁN "HOÁ HỌC - THẦY CHIẾN"
-    // =========================================================================
     const SUPABASE_URL = "https://tfmexicqxbuznmvtepzq.supabase.co";
     const SUPABASE_KEY = "sb_publishable_gC4WzQW2X2bhuAX4QpPzcg_EBHDDGMg";
     const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -81,7 +89,6 @@
     const STUDENT_CLASS_CODE = "THAYCHIEN";
     const TEACHER_ADMIN_CODE = "ADMIN_THAYCHIEN";
 
-    // Dữ liệu mẫu chuẩn GDPT 2018 (Danh pháp IUPAC)
     const SAMPLE_QUESTIONS = [
       {
         id: "q1",
@@ -167,7 +174,6 @@
       }
     ];
 
-    // Trạng thái toàn cục của ứng dụng
     const state = {
       user: null,
       authTab: "login",
@@ -191,7 +197,6 @@
       adminSubTab: "single"
     };
 
-    // Hàm tiện ích chuẩn hóa văn bản & mã câu hỏi
     function esc(str) {
       return String(str || "")
         .replace(/&/g, "&amp;")
@@ -222,9 +227,81 @@
       return state.user && state.user.role === "admin";
     }
 
-    // Khởi tạo ứng dụng
+    // Đọc tham số ?cau=... trên URL (khi người dùng bấm từ Google hoặc link chia sẻ)
+    function applyUrlQueryParam() {
+      const params = new URLSearchParams(window.location.search);
+      const qParam = params.get("cau") || params.get("q");
+      if (qParam) {
+        state.mode = "lookup";
+        state.searchQuery = qParam.trim();
+        state.searchAllGrades = true;
+        const matched = getFilteredLookupQuestions();
+        if (matched.length > 0) {
+          const topQ = matched[0];
+          state.revealedHints[topQ.id] = true;
+          state.revealedSol[topQ.id] = true;
+          updateSeoMetadata(topQ);
+        }
+      } else {
+        updateSeoMetadata(null);
+      }
+    }
+
+    // Cập nhật tiêu đề, mô tả và dữ liệu QAPage chuẩn Google Search
+    function updateSeoMetadata(singleQ) {
+      const schemaEl = document.getElementById("qa-schema");
+      if (singleQ) {
+        const ansText = Array.isArray(singleQ.correct_answer) ? singleQ.correct_answer.join(" | ") : singleQ.correct_answer;
+        document.title = `[${singleQ.question_code || "Hóa học"}] ${singleQ.content.slice(0, 75)} - Hóa Học Thầy Chiến`;
+        const metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.setAttribute("content", `Đáp án: ${ansText}. ${singleQ.explanation || ""}`.slice(0, 160));
+
+        if (schemaEl) {
+          schemaEl.textContent = JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "QAPage",
+            "mainEntity": {
+              "@type": "Question",
+              "name": singleQ.content,
+              "text": singleQ.content,
+              "answerCount": 1,
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": `Đáp án: ${ansText}. Lời giải chi tiết: ${singleQ.explanation || ""}`
+              }
+            }
+          });
+        }
+      } else {
+        document.title = "Hóa Học Thầy Chiến - Tra cứu Lời giải & Luyện thi Hóa học";
+        if (schemaEl) {
+          schemaEl.textContent = JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": state.questions.slice(0, 20).map((q) => ({
+              "@type": "Question",
+              "name": q.content,
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": `${Array.isArray(q.correct_answer) ? q.correct_answer.join(" | ") : q.correct_answer} - ${q.explanation || ""}`
+              }
+            }))
+          });
+        }
+      }
+    }
+
+    function copyQuestionLink(codeOrId, textQuery) {
+      const url = new URL(window.location.origin + window.location.pathname);
+      url.searchParams.set("cau", codeOrId || textQuery);
+      navigator.clipboard.writeText(url.toString());
+      alert("Đã sao chép đường dẫn công khai của câu hỏi:\n" + url.toString());
+    }
+
     async function initApp() {
+      applyUrlQueryParam();
       renderAll();
+
       try {
         const { data: sessData } = await db.auth.getSession();
         if (sessData && sessData.session && sessData.session.user) {
@@ -240,6 +317,7 @@
         if (qData && qData.length > 0) state.questions = qData;
       } catch (e) { console.log(e); }
 
+      applyUrlQueryParam();
       renderAll();
     }
 
@@ -263,7 +341,6 @@
       }
     }
 
-    // Xử lý đăng nhập / đăng ký
     function openAuthModal() {
       document.getElementById("auth-modal").classList.remove("hidden");
       switchAuthTab("login");
@@ -363,7 +440,6 @@
       renderAll();
     }
 
-    // Điều hướng Khối & Chế độ
     function selectGrade(id) {
       state.selectedGrade = id;
       state.chapterFilter = "ALL";
@@ -392,11 +468,7 @@
       return m + ":" + (s < 10 ? "0" : "") + s;
     }
 
-    // =========================================================================
-    // RENDER GIAO DIỆN CHÍNH
-    // =========================================================================
     function renderAll() {
-      // 1. Nút chọn Khối lớp
       document.getElementById("grade-buttons").innerHTML = state.grades.map((g) => `
         <button onclick="selectGrade('${esc(g.id)}')"
           class="px-3 py-1.5 rounded-lg text-sm font-semibold transition ${
@@ -406,7 +478,6 @@
         </button>
       `).join("");
 
-      // 2. Khu vực Tài khoản
       const authArea = document.getElementById("auth-area");
       if (state.user) {
         authArea.innerHTML = `
@@ -426,7 +497,6 @@
         `;
       }
 
-      // 3. Thanh điều hướng chế độ
       const tabs = [
         { id: "lookup", label: "🔍 1. Tra cứu Mã câu & Đề bài" },
         { id: "practice", label: "🎯 2. Luyện tập chuyên đề" },
@@ -447,23 +517,35 @@
         </button>
       `).join("");
 
-      // 4. Nội dung chính theo chế độ
+      // Tạo liên kết tĩnh công khai ở chân trang để bot Google thu thập dữ liệu
+      const footerLinks = document.getElementById("public-index-links");
+      if (footerLinks) {
+        footerLinks.innerHTML = state.questions.slice(0, 30).map((q) => {
+          const code = q.question_code || q.id;
+          return `<a href="?cau=${encodeURIComponent(code)}" class="text-teal-700 hover:underline">[${esc(code)}] ${esc(q.content.slice(0, 45))}...</a>`;
+        }).join(" • ");
+      }
+
       const main = document.getElementById("app-main");
       if (state.mode === "lookup") main.innerHTML = renderLookupView();
       else if (state.mode === "practice" || state.mode === "exam") main.innerHTML = renderPracticeOrExamView();
       else if (state.mode === "admin" && isAdmin()) main.innerHTML = renderAdminView();
     }
 
-    // =========================================================================
-    // CHẾ ĐỘ 1: TRA CỨU KẾT HỢP MÃ CÂU HỎI & TỪ KHÓA
-    // =========================================================================
     function updateSearch(val) {
       state.searchQuery = val;
+      const url = new URL(window.location.href);
+      if (val.trim()) url.searchParams.set("cau", val.trim());
+      else url.searchParams.delete("cau");
+      window.history.replaceState({}, "", url);
       renderLookupResultsOnly();
     }
 
     function setQuickCode(code) {
       state.searchQuery = code;
+      const url = new URL(window.location.href);
+      url.searchParams.set("cau", code);
+      window.history.replaceState({}, "", url);
       renderAll();
     }
 
@@ -531,7 +613,7 @@
         const corrStr = Array.isArray(q.correct_answer) ? q.correct_answer.join(" | ") : q.correct_answer;
 
         return `
-          <div class="bg-white p-5 rounded-xl shadow-sm border space-y-3 ${
+          <article class="bg-white p-5 rounded-xl shadow-sm border space-y-3 ${
             q.matchType === "exact_code" ? "border-2 border-teal-600 ring-2 ring-teal-100" : "border-slate-200"
           }">
             <div class="flex flex-wrap justify-between items-center gap-2 text-xs">
@@ -541,12 +623,15 @@
                 ${q.matchType === "exact_code" ? `<span class="bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded">✓ Khớp chính xác Mã câu hỏi</span>` : ""}
                 ${q.matchType === "keyword" ? `<span class="bg-sky-50 text-sky-700 font-medium px-2 py-0.5 rounded">Khớp ${q.matchPercent}% từ khóa</span>` : ""}
               </div>
-              <span class="text-slate-400">👁️ ${q.search_count || 0} lượt xem</span>
+              <button onclick="copyQuestionLink('${esc(q.question_code || "")}', '${esc(q.content.slice(0, 40))}')"
+                class="text-teal-700 hover:underline font-medium">
+                🔗 Lấy link câu này
+              </button>
             </div>
 
-            <p class="font-medium text-slate-900 leading-relaxed">
+            <h3 class="font-medium text-slate-900 leading-relaxed text-base">
               ${q.question_code ? "[" + esc(q.question_code) + "] " : "Câu " + (idx + 1) + ": "}${esc(q.content)}
-            </p>
+            </h3>
 
             ${(q.options && q.options.length > 0) ? `
               <ul class="grid sm:grid-cols-2 gap-2 text-sm text-slate-700 pl-2">
@@ -578,7 +663,7 @@
                 <p class="leading-relaxed whitespace-pre-line">${esc(q.explanation)}</p>
               </div>
             ` : ""}
-          </div>
+          </article>
         `;
       }).join("");
     }
@@ -642,9 +727,6 @@
       `;
     }
 
-    // =========================================================================
-    // CHẾ ĐỘ 2 & 3: LUYỆN TẬP & KIỂM TRA
-    // =========================================================================
     function setMcqAnswer(qid, opt) {
       state.answers[qid] = opt;
       renderAll();
@@ -788,9 +870,6 @@
       `;
     }
 
-    // =========================================================================
-    // CHẾ ĐỘ 4: QUẢN TRỊ ĐỘC QUYỀN CỦA GIÁO VIÊN
-    // =========================================================================
     function autoExtractCode(textarea) {
       const val = textarea.value;
       const match = val.trim().match(/^\[([A-Za-z0-9-_]+)\]\s*(.*)$/s);
@@ -1062,7 +1141,6 @@
       `;
     }
 
-    // Chạy khởi tạo ngay khi tải xong trang
     initApp();
   </script>
 </body>
