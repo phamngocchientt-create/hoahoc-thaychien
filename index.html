@@ -4,11 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="index, follow" />
-  <meta name="description" content="Hệ thống tra cứu lời giải, gợi ý tư duy và luyện thi Hóa học chuẩn chương trình GDPT 2018 (Danh pháp IUPAC) - Hóa Học Thầy Chiến." />
-  <title>Hóa Học Thầy Chiến (v4.5) - Tra cứu Lời giải & Luyện thi Hóa học</title>
+  <meta name="description" content="Cổng học liệu Hóa học trực tuyến - Thầy Chiến. Tra cứu lời giải chuẩn IUPAC, ôn tập chuyên đề, thi thử và kho tài liệu KHTN 9 - Hóa học 10." />
+  <title>Hóa Học Thầy Chiến (v4.6) - Cổng Học Liệu & Tra Cứu Lời Giải</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- Thư viện KaTeX hiển thị công thức Toán - Hóa / LaTeX / MathType -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
@@ -22,16 +21,16 @@
 <body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
 
   <!-- HEADER -->
-  <header class="bg-teal-800 text-white shadow-md">
+  <header class="bg-teal-900 text-white shadow-md sticky top-0 z-30">
     <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-center gap-3">
-        <a href="?" class="bg-amber-400 text-teal-950 font-extrabold px-3 py-1.5 rounded-lg text-lg">H₂O</a>
+      <div class="flex items-center gap-3 cursor-pointer" onclick="goHome()">
+        <div class="bg-amber-400 text-teal-950 font-extrabold px-3 py-1.5 rounded-lg text-lg shadow-sm">H₂O</div>
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="font-bold text-lg leading-tight">HÓA HỌC THẦY CHIẾN</h1>
-            <span class="text-[11px] bg-teal-950 text-amber-300 font-mono px-2 py-0.5 rounded">v4.5</span>
+            <h1 class="font-bold text-lg leading-tight tracking-tight">HÓA HỌC THẦY CHIẾN</h1>
+            <span class="text-[11px] bg-teal-950 text-amber-300 font-mono px-2 py-0.5 rounded">v4.6</span>
           </div>
-          <p class="text-xs text-teal-200">Tra cứu lời giải chuẩn IUPAC • Hỗ trợ công thức LaTeX / MathType</p>
+          <p class="text-xs text-teal-200 hidden sm:block">Cổng học liệu chuẩn GDPT 2018 • Danh pháp IUPAC</p>
         </div>
       </div>
 
@@ -40,21 +39,24 @@
         <div id="auth-area"></div>
       </div>
     </div>
+
+    <!-- THANH ĐIỀU HƯỚNG NHANH -->
+    <nav class="bg-teal-800/90 border-t border-teal-700/60">
+      <div id="nav-tabs" class="max-w-6xl mx-auto px-4 flex overflow-x-auto gap-1.5 py-2"></div>
+    </nav>
   </header>
 
-  <!-- NAVIGATION TABS -->
-  <nav class="bg-white border-b border-slate-200 sticky top-0 z-10">
-    <div id="nav-tabs" class="max-w-6xl mx-auto px-4 flex overflow-x-auto gap-2 py-2.5"></div>
-  </nav>
-
   <!-- MAIN CONTENT -->
-  <main id="app-main" class="max-w-5xl w-full mx-auto px-4 py-6 flex-1"></main>
+  <main id="app-main" class="max-w-6xl w-full mx-auto px-4 py-6 flex-1"></main>
 
-  <!-- FOOTER SEO & MỤC LỤC CÔNG KHAI -->
-  <footer class="bg-white border-t border-slate-200 mt-10 py-6 text-xs text-slate-500">
-    <div class="max-w-5xl mx-auto px-4 space-y-2">
-      <p class="font-semibold text-slate-700">Ngân hàng câu hỏi & Hướng dẫn giải Hóa học - Thầy Chiến (Chuẩn GDPT 2018)</p>
-      <div id="public-index-links" class="flex flex-wrap gap-2"></div>
+  <!-- FOOTER -->
+  <footer class="bg-white border-t border-slate-200 mt-12 py-6 text-xs text-slate-500">
+    <div class="max-w-6xl mx-auto px-4 space-y-3">
+      <div class="flex flex-wrap justify-between items-center gap-2">
+        <p class="font-bold text-slate-700">HỆ THỐNG HỌC LIỆU HÓA HỌC THẦY CHIẾN</p>
+        <p>Chương trình GDPT 2018 • Danh pháp quốc tế IUPAC • Điều kiện chuẩn $25^\circ\text{C}, 1\text{ bar}$ ($24,79\text{ L/mol}$)</p>
+      </div>
+      <div id="public-index-links" class="flex flex-wrap gap-2 pt-2 border-t border-slate-100"></div>
     </div>
   </footer>
 
@@ -97,6 +99,42 @@
 
     const STUDENT_CLASS_CODE = "THAYCHIEN";
     const TEACHER_ADMIN_CODE = "ADMIN_THAYCHIEN";
+
+    // Kho tài liệu mặc định (Thầy có thể thêm tài liệu mới qua mục Quản trị hoặc lưu trong localStorage/Supabase)
+    const DEFAULT_DOCS = [
+      {
+        id: "doc1",
+        grade_id: "9",
+        category: "Tóm tắt lý thuyết",
+        title: "Bảng hệ thống hóa tính chất hóa học của Kim loại & Phi kim (KHTN 9)",
+        summary: "Tổng hợp dãy hoạt động hóa học của kim loại, phản ứng với oxygen, nước, dung dịch acid và dung dịch muối theo danh pháp IUPAC.",
+        link: "#tailieu-kimloai9"
+      },
+      {
+        id: "doc2",
+        grade_id: "9",
+        category: "Chuyên đề ôn thi",
+        title: "Chuyên đề Hydrocarbon: Alkane – Alkene và ứng dụng thực tiễn",
+        summary: "So sánh cấu tạo phân tử, phản ứng thế của Methane ($CH_4$) và phản ứng cộng làm mất màu nước bromine của Ethylene ($C_2H_4$).",
+        link: "#tailieu-hydrocarbon9"
+      },
+      {
+        id: "doc3",
+        grade_id: "10",
+        category: "Công thức & Quy tắc",
+        title: "Sổ tay Cấu tạo nguyên tử & Bảng tuần hoàn các nguyên tố hóa học (Hóa 10)",
+        summary: "Quy tắc viết cấu hình electron nguyên tử, xác định vị trí nguyên tố (ô, chu kì, nhóm) và xu hướng biến đổi tính chất.",
+        link: "#tailieu-nguyentu10"
+      },
+      {
+        id: "doc4",
+        grade_id: "9",
+        category: "Hướng dẫn tra cứu",
+        title: "Bảng quy đổi danh pháp tiếng Anh IUPAC chuẩn GDPT 2018",
+        summary: "Tra cứu nhanh tên gọi mới của các nguyên tố (Iron, Copper, Aluminium...), oxide, acid, base và muối thường gặp.",
+        link: "#tailieu-iupac"
+      }
+    ];
 
     const SAMPLE_QUESTIONS = [
       {
@@ -191,8 +229,9 @@
         { id: "10", name: "Khối 10", description: "Hóa học 10 (KNTT)" }
       ],
       selectedGrade: "9",
-      mode: "lookup",
+      mode: "home", // Mặc định vào trang chủ Portal chuyên nghiệp
       questions: [...SAMPLE_QUESTIONS],
+      docs: JSON.parse(localStorage.getItem("thaychien_docs") || "null") || [...DEFAULT_DOCS],
       searchQuery: "",
       chapterFilter: "ALL",
       searchAllGrades: true,
@@ -214,11 +253,9 @@
         .replace(/"/g, "&quot;");
     }
 
-    // Định dạng xuống dòng thông minh & giữ nguyên cú pháp LaTeX ($...$, $$...$$)
     function formatRichText(rawText) {
       if (!rawText) return "";
       const escaped = esc(rawText);
-      // Hỗ trợ cả xuống dòng thật (\n) và chuỗi "\\n" nếu nhập từ nguồn khác
       const normalizedBreaks = escaped.replace(/\\n/g, "\n");
       const lines = normalizedBreaks.split(/\r?\n/);
       return `<div class="formatted-text">${lines.map((line) => {
@@ -228,7 +265,6 @@
       }).join("")}</div>`;
     }
 
-    // Kích hoạt KaTeX để vẽ công thức Toán/Hóa sau mỗi lần render
     function renderMathTypeset() {
       if (typeof renderMathInElement === "function") {
         renderMathInElement(document.body, {
@@ -310,7 +346,7 @@
           });
         }
       } else {
-        document.title = "Hóa Học Thầy Chiến (v4.5) - Tra cứu Lời giải & Luyện thi Hóa học";
+        document.title = "Hóa Học Thầy Chiến (v4.6) - Cổng Học Liệu & Tra Cứu Lời Giải";
         if (schemaEl) {
           schemaEl.textContent = JSON.stringify({
             "@context": "https://schema.org",
@@ -473,7 +509,15 @@
     async function handleLogout() {
       await db.auth.signOut();
       state.user = null;
-      if (state.mode === "admin") state.mode = "lookup";
+      if (state.mode === "admin") state.mode = "home";
+      renderAll();
+    }
+
+    function goHome() {
+      state.mode = "home";
+      state.searchQuery = "";
+      const url = new URL(window.location.origin + window.location.pathname);
+      window.history.replaceState({}, "", url);
       renderAll();
     }
 
@@ -496,6 +540,19 @@
           }
         }, 1000);
       }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      renderAll();
+    }
+
+    function triggerHeroSearch(e) {
+      e.preventDefault();
+      const val = document.getElementById("hero-search-input").value.trim();
+      state.searchQuery = val;
+      state.mode = "lookup";
+      const url = new URL(window.location.href);
+      if (val) url.searchParams.set("cau", val);
+      else url.searchParams.delete("cau");
+      window.history.replaceState({}, "", url);
       renderAll();
     }
 
@@ -509,7 +566,7 @@
       document.getElementById("grade-buttons").innerHTML = state.grades.map((g) => `
         <button onclick="selectGrade('${esc(g.id)}')"
           class="px-3 py-1.5 rounded-lg text-sm font-semibold transition ${
-            state.selectedGrade === g.id ? "bg-amber-400 text-slate-900" : "bg-teal-700 hover:bg-teal-600 text-white"
+            state.selectedGrade === g.id ? "bg-amber-400 text-slate-900 shadow-sm" : "bg-teal-800 hover:bg-teal-700 text-white border border-teal-700"
           }">
           ${esc(g.name)}
         </button>
@@ -518,7 +575,7 @@
       const authArea = document.getElementById("auth-area");
       if (state.user) {
         authArea.innerHTML = `
-          <div class="flex items-center gap-2 ml-2 bg-teal-900 border border-teal-600 px-3 py-1.5 rounded-lg text-sm">
+          <div class="flex items-center gap-2 ml-1 bg-teal-950/70 border border-teal-700 px-3 py-1.5 rounded-lg text-sm">
             <span class="font-semibold">
               ${isAdmin() ? "🛡️ GV: " : "🎓 HS: "}${esc(state.user.full_name)}
               ${state.user.class_name && !isAdmin() ? " (" + esc(state.user.class_name) + ")" : ""}
@@ -528,27 +585,29 @@
         `;
       } else {
         authArea.innerHTML = `
-          <button onclick="openAuthModal()" class="ml-2 bg-white text-teal-900 font-bold px-3.5 py-1.5 rounded-lg text-sm hover:bg-teal-50 shadow-sm">
+          <button onclick="openAuthModal()" class="ml-1 bg-white text-teal-900 font-bold px-3.5 py-1.5 rounded-lg text-sm hover:bg-teal-50 shadow-sm">
             Đăng nhập
           </button>
         `;
       }
 
       const tabs = [
-        { id: "lookup", label: "🔍 1. Tra cứu Mã câu & Đề bài" },
-        { id: "practice", label: "🎯 2. Luyện tập chuyên đề" },
-        { id: "exam", label: "⏱️ 3. Kiểm tra / Thi thử" }
+        { id: "home", label: "🏠 Trang chủ" },
+        { id: "lookup", label: "🔍 Tìm kiếm Đáp án" },
+        { id: "practice", label: "🎯 Ôn tập chuyên đề" },
+        { id: "exam", label: "⏱️ Kiểm tra / Thi thử" },
+        { id: "docs", label: "📚 Kho Tài liệu" }
       ];
       if (isAdmin()) {
-        tabs.push({ id: "admin", label: "🛡️ Quản trị Giáo viên (Nhập Mã & Đề)" });
+        tabs.push({ id: "admin", label: "🛡️ Quản trị Giáo viên" });
       }
 
       document.getElementById("nav-tabs").innerHTML = tabs.map((t) => `
         <button onclick="selectMode('${t.id}')"
-          class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition ${
+          class="px-3.5 py-1.5 rounded-lg text-sm font-semibold whitespace-nowrap transition ${
             state.mode === t.id
-              ? (t.id === "admin" ? "bg-amber-600 text-white shadow-sm" : "bg-teal-700 text-white shadow-sm")
-              : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+              ? (t.id === "admin" ? "bg-amber-500 text-slate-950 shadow-sm" : "bg-white text-teal-900 shadow-sm")
+              : "text-teal-100 hover:bg-teal-700/70"
           }">
           ${t.label}
         </button>
@@ -558,18 +617,263 @@
       if (footerLinks) {
         footerLinks.innerHTML = state.questions.slice(0, 30).map((q) => {
           const code = q.question_code || q.id;
-          return `<a href="?cau=${encodeURIComponent(code)}" class="text-teal-700 hover:underline">[${esc(code)}] ${esc(q.content.replace(/\$/g, "").slice(0, 45))}...</a>`;
+          return `<a href="?cau=${encodeURIComponent(code)}" class="text-teal-700 hover:underline">[${esc(code)}] ${esc(q.content.replace(/\$/g, "").slice(0, 40))}...</a>`;
         }).join(" • ");
       }
 
       const main = document.getElementById("app-main");
-      if (state.mode === "lookup") main.innerHTML = renderLookupView();
+      if (state.mode === "home") main.innerHTML = renderHomeView();
+      else if (state.mode === "lookup") main.innerHTML = renderLookupView();
       else if (state.mode === "practice" || state.mode === "exam") main.innerHTML = renderPracticeOrExamView();
+      else if (state.mode === "docs") main.innerHTML = renderDocsView();
       else if (state.mode === "admin" && isAdmin()) main.innerHTML = renderAdminView();
 
       renderMathTypeset();
     }
 
+    // =========================================================================
+    // TRANG CHỦ PORTAL MỞ ĐẦU CHUYÊN NGHIỆP
+    // =========================================================================
+    function renderHomeView() {
+      const currentGradeObj = state.grades.find((g) => g.id === state.selectedGrade) || state.grades[0];
+      const totalQ = state.questions.length;
+      const totalDocs = state.docs.length;
+
+      return `
+        <div class="space-y-8">
+          <!-- HERO BANNER & THANH TÌM KIẾM TRUNG TÂM -->
+          <section class="bg-gradient-to-br from-teal-900 via-teal-800 to-emerald-800 text-white rounded-2xl p-6 sm:p-10 shadow-lg relative overflow-hidden">
+            <div class="max-w-3xl mx-auto text-center space-y-5 relative z-10">
+              <span class="inline-block bg-teal-950/60 border border-teal-500/40 text-amber-300 text-xs font-bold px-3.5 py-1 rounded-full tracking-wide">
+                CHƯƠNG TRÌNH GDPT 2018 • KẾT NỐI TRI THỨC VỚI CUỘC SỐNG
+              </span>
+              <h2 class="text-2xl sm:text-4xl font-extrabold leading-tight">
+                Chào mừng đến với Cổng Học Liệu <span class="text-amber-300">Hóa Học Thầy Chiến</span>
+              </h2>
+              <p class="text-sm sm:text-base text-teal-100 max-w-2xl mx-auto leading-relaxed">
+                Hệ thống tra cứu lời giải chi tiết theo mã bài tập, ôn tập phân hóa theo từng chuyên đề, luyện đề trực tuyến và kho tài liệu Hóa học dành cho học sinh <strong>${esc(currentGradeObj.name)}</strong>.
+              </p>
+
+              <!-- HỘP TÌM KIẾM ĐÁP ÁN NHANH -->
+              <form onsubmit="triggerHeroSearch(event)" class="max-w-2xl mx-auto pt-2">
+                <div class="flex flex-col sm:flex-row gap-2 bg-white p-2 rounded-xl shadow-md">
+                  <input
+                    id="hero-search-input"
+                    type="text"
+                    placeholder="Nhập Mã câu hỏi (VD: 9KL-01, 10NT-01) hoặc nội dung đề bài cần tìm đáp án..."
+                    class="flex-1 px-4 py-3 text-slate-800 text-sm sm:text-base focus:outline-none rounded-lg"
+                  />
+                  <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold px-6 py-3 rounded-lg text-sm sm:text-base transition shrink-0">
+                    🔍 Tìm đáp án ngay
+                  </button>
+                </div>
+              </form>
+
+              <div class="flex flex-wrap justify-center items-center gap-2 text-xs text-teal-200 pt-1">
+                <span>Mã tra cứu phổ biến:</span>
+                ${["9KL-01", "9HC-02", "9KL-05", "10NT-01"].map((c) => `
+                  <button type="button" onclick="setQuickCode('${c}')"
+                    class="bg-teal-950/60 hover:bg-amber-400 hover:text-slate-950 border border-teal-600/60 px-2.5 py-1 rounded font-mono font-bold transition">
+                    ${c}
+                  </button>
+                `).join("")}
+              </div>
+            </div>
+          </section>
+
+          <!-- CÁC PHÂN MỤC CHỨC NĂNG CHÍNH (PORTAL CARDS) -->
+          <section class="space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold text-lg text-slate-800">Danh mục học tập & Tra cứu</h3>
+              <span class="text-xs text-slate-500">Đang chọn: <strong>${esc(currentGradeObj.name)}</strong></span>
+            </div>
+
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <!-- Mục 1: Tìm kiếm đáp án -->
+              <div onclick="selectMode('lookup')"
+                class="group bg-white p-6 rounded-2xl border border-slate-200 hover:border-teal-600 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between space-y-4">
+                <div class="space-y-2.5">
+                  <div class="w-12 h-12 rounded-xl bg-teal-100 text-teal-800 flex items-center justify-center text-2xl font-bold group-hover:bg-teal-700 group-hover:text-white transition">
+                    🔍
+                  </div>
+                  <h4 class="font-bold text-base text-slate-900 group-hover:text-teal-700">1. Tìm kiếm Đáp án</h4>
+                  <p class="text-xs text-slate-600 leading-relaxed">
+                    Tra cứu nhanh bằng Mã bài tập in trên phiếu hoặc gõ từ khóa đề bài để xem gợi ý tư duy và lời giải chi tiết.
+                  </p>
+                </div>
+                <div class="pt-2 border-t border-slate-100 flex justify-between items-center text-xs font-bold text-teal-700">
+                  <span>${totalQ} câu hỏi sẵn sàng</span>
+                  <span>Truy cập →</span>
+                </div>
+              </div>
+
+              <!-- Mục 2: Ôn tập chuyên đề -->
+              <div onclick="selectMode('practice')"
+                class="group bg-white p-6 rounded-2xl border border-slate-200 hover:border-emerald-600 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between space-y-4">
+                <div class="space-y-2.5">
+                  <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center text-2xl font-bold group-hover:bg-emerald-700 group-hover:text-white transition">
+                    🎯
+                  </div>
+                  <h4 class="font-bold text-base text-slate-900 group-hover:text-emerald-700">2. Ôn tập Chuyên đề</h4>
+                  <p class="text-xs text-slate-600 leading-relaxed">
+                    Tự luyện từng câu hỏi theo chủ đề kiến thức, kiểm tra kết quả ngay lập tức và xem phân tích lỗi sai.
+                  </p>
+                </div>
+                <div class="pt-2 border-t border-slate-100 flex justify-between items-center text-xs font-bold text-emerald-700">
+                  <span>Luyện tập tương tác</span>
+                  <span>Bắt đầu ôn →</span>
+                </div>
+              </div>
+
+              <!-- Mục 3: Kiểm tra / Thi thử -->
+              <div onclick="selectMode('exam')"
+                class="group bg-white p-6 rounded-2xl border border-slate-200 hover:border-rose-600 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between space-y-4">
+                <div class="space-y-2.5">
+                  <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-800 flex items-center justify-center text-2xl font-bold group-hover:bg-rose-600 group-hover:text-white transition">
+                    ⏱️
+                  </div>
+                  <h4 class="font-bold text-base text-slate-900 group-hover:text-rose-700">3. Kiểm tra & Thi thử</h4>
+                  <p class="text-xs text-slate-600 leading-relaxed">
+                    Đề tổng hợp chuẩn cấu trúc mới (Trắc nghiệm, Đúng/Sai 4 ý, Trả lời ngắn, Tự luận) có tính giờ và chấm điểm.
+                  </p>
+                </div>
+                <div class="pt-2 border-t border-slate-100 flex justify-between items-center text-xs font-bold text-rose-700">
+                  <span>15 phút • Tự động chấm</span>
+                  <span>Vào thi →</span>
+                </div>
+              </div>
+
+              <!-- Mục 4: Kho Tài liệu -->
+              <div onclick="selectMode('docs')"
+                class="group bg-white p-6 rounded-2xl border border-slate-200 hover:border-amber-600 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between space-y-4">
+                <div class="space-y-2.5">
+                  <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center text-2xl font-bold group-hover:bg-amber-600 group-hover:text-white transition">
+                    📚
+                  </div>
+                  <h4 class="font-bold text-base text-slate-900 group-hover:text-amber-700">4. Kho Tài liệu & Lý thuyết</h4>
+                  <p class="text-xs text-slate-600 leading-relaxed">
+                    Tóm tắt trọng tâm từng chương, bảng danh pháp IUPAC, sơ đồ phản ứng và phiếu bài tập bổ trợ của Thầy Chiến.
+                  </p>
+                </div>
+                <div class="pt-2 border-t border-slate-100 flex justify-between items-center text-xs font-bold text-amber-700">
+                  <span>${totalDocs} chuyên đề tài liệu</span>
+                  <span>Mở kho →</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- THÔNG TIN HƯỚNG DẪN & GÓC THÔNG BÁO -->
+          <section class="grid md:grid-cols-3 gap-4">
+            <div class="md:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 space-y-3">
+              <h3 class="font-bold text-base text-teal-900 flex items-center gap-2">
+                <span>📌</span> Quy chuẩn học tập & Tra cứu trên hệ thống
+              </h3>
+              <ul class="text-xs sm:text-sm text-slate-600 space-y-2 leading-relaxed">
+                <li>• <strong>Danh pháp hóa học:</strong> Sử dụng thống nhất tên gọi tiếng Anh theo chuẩn IUPAC (<em>Iron, Copper, Aluminium, sulfuric acid, sodium hydroxide...</em>).</li>
+                <li>• <strong>Hằng số tính toán:</strong> Thể tích mol chất khí ở điều kiện chuẩn ($25^\circ\text{C}, 1\text{ bar}$) lấy giá trị $V_m = 24,79\text{ L/mol}$.</li>
+                <li>• <strong>Cách tra cứu nhanh nhất:</strong> Mỗi bài tập trên phiếu học tập đều có gắn <strong>Mã câu hỏi</strong> ở đầu câu (ví dụ: <code class="bg-slate-100 px-1.5 py-0.5 rounded font-mono font-bold text-teal-800">[9KL-01]</code>). Học sinh chỉ cần nhập đúng mã này vào ô tìm kiếm để xem hướng dẫn từng bước.</li>
+              </ul>
+            </div>
+
+            <div class="bg-amber-50/80 p-6 rounded-2xl border border-amber-200 flex flex-col justify-between space-y-4">
+              <div class="space-y-2">
+                <h3 class="font-bold text-base text-amber-900">🎓 Dành cho Học sinh & Giáo viên</h3>
+                <p class="text-xs text-amber-950/80 leading-relaxed">
+                  Học sinh có thể tra cứu tự do hoặc đăng ký tài khoản bằng <strong>Mã lớp</strong> của Thầy Chiến để lưu lịch sử làm bài.
+                </p>
+              </div>
+              <div class="flex flex-col gap-2">
+                ${isAdmin() ? `
+                  <button onclick="selectMode('admin')" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm">
+                    🛡️ Mở trang Quản trị Giáo viên
+                  </button>
+                ` : `
+                  <button onclick="openAuthModal()" class="w-full bg-teal-800 hover:bg-teal-900 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm">
+                    Đăng nhập / Đăng ký tài khoản
+                  </button>
+                `}
+              </div>
+            </div>
+          </section>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // MỤC 4: KHO TÀI LIỆU & LÝ THUYẾT
+    // =========================================================================
+    function renderDocsView() {
+      const gradeDocs = state.docs.filter((d) => d.grade_id === state.selectedGrade || d.grade_id === "ALL");
+      return `
+        <div class="space-y-5">
+          <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-wrap justify-between items-center gap-3">
+            <div>
+              <h2 class="font-bold text-lg text-slate-800">📚 Kho Tài liệu & Tóm tắt kiến thức</h2>
+              <p class="text-sm text-slate-500">Tổng hợp chuyên đề, bảng tra cứu IUPAC và tài liệu ôn tập của Thầy Chiến.</p>
+            </div>
+            <button onclick="goHome()" class="text-xs font-semibold text-teal-700 hover:underline">← Quay lại Trang chủ</button>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-4">
+            ${gradeDocs.map((doc) => `
+              <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between space-y-3">
+                <div class="space-y-2">
+                  <div class="flex items-center gap-2 text-xs">
+                    <span class="bg-amber-100 text-amber-900 font-bold px-2.5 py-0.5 rounded">${esc(doc.category)}</span>
+                    <span class="bg-slate-100 text-slate-600 font-semibold px-2 py-0.5 rounded">Khối ${esc(doc.grade_id)}</span>
+                  </div>
+                  <h3 class="font-bold text-base text-slate-900">${esc(doc.title)}</h3>
+                  <div class="text-sm text-slate-600 leading-relaxed">${formatRichText(doc.summary)}</div>
+                </div>
+                <div class="pt-3 border-t border-slate-100 flex justify-between items-center">
+                  ${doc.link && doc.link.startsWith("http") ? `
+                    <a href="${esc(doc.link)}" target="_blank" rel="noopener" class="text-xs font-bold text-teal-700 hover:underline">
+                      📥 Mở / Tải tài liệu (Google Drive / PDF) →
+                    </a>
+                  ` : `
+                    <button onclick="selectMode('lookup')" class="text-xs font-bold text-teal-700 hover:underline">
+                      🔍 Tra cứu bài tập chuyên đề này →
+                    </button>
+                  `}
+                  ${isAdmin() ? `
+                    <button onclick="deleteDoc('${esc(doc.id)}')" class="text-xs text-rose-600 hover:underline">Xóa</button>
+                  ` : ""}
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function addNewDoc(e) {
+      e.preventDefault();
+      if (!isAdmin()) return;
+      const newDoc = {
+        id: "doc_" + Date.now(),
+        grade_id: document.getElementById("doc-grade").value,
+        category: document.getElementById("doc-cat").value.trim(),
+        title: document.getElementById("doc-title").value.trim(),
+        summary: document.getElementById("doc-summary").value.trim(),
+        link: document.getElementById("doc-link").value.trim()
+      };
+      state.docs.unshift(newDoc);
+      localStorage.setItem("thaychien_docs", JSON.stringify(state.docs));
+      alert("Đã đăng tài liệu mới lên Kho Tài liệu!");
+      renderAll();
+    }
+
+    function deleteDoc(id) {
+      if (!isAdmin() || !confirm("Xóa tài liệu này?")) return;
+      state.docs = state.docs.filter((d) => d.id !== id);
+      localStorage.setItem("thaychien_docs", JSON.stringify(state.docs));
+      renderAll();
+    }
+
+    // =========================================================================
+    // MỤC 1: TÌM KIẾM ĐÁP ÁN & LỜI GIẢI
+    // =========================================================================
     function updateSearch(val) {
       state.searchQuery = val;
       const url = new URL(window.location.href);
@@ -581,6 +885,7 @@
 
     function setQuickCode(code) {
       state.searchQuery = code;
+      state.mode = "lookup";
       const url = new URL(window.location.href);
       url.searchParams.set("cau", code);
       window.history.replaceState({}, "", url);
@@ -726,16 +1031,19 @@
       const chapters = ["ALL", ...Array.from(new Set(sourceList.map((q) => q.chapter)))];
 
       return `
-        <div class="space-y-4">
+        <div class="max-w-5xl mx-auto space-y-4">
           <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-3">
             <div class="flex flex-wrap justify-between items-center gap-2">
-              <h2 class="font-bold text-lg text-slate-800">Tra cứu hướng dẫn giải & Đáp án</h2>
-              <label class="flex items-center gap-2 text-xs text-slate-600 cursor-pointer">
-                <input type="checkbox" ${state.searchAllGrades ? "checked" : ""}
-                  onchange="state.searchAllGrades = this.checked; renderLookupResultsOnly();"
-                  class="rounded text-teal-600" />
-                Tìm mã câu hỏi trên tất cả các khối lớp
-              </label>
+              <h2 class="font-bold text-lg text-slate-800">🔍 Tra cứu hướng dẫn giải & Đáp án</h2>
+              <div class="flex items-center gap-4">
+                <label class="flex items-center gap-2 text-xs text-slate-600 cursor-pointer">
+                  <input type="checkbox" ${state.searchAllGrades ? "checked" : ""}
+                    onchange="state.searchAllGrades = this.checked; renderLookupResultsOnly();"
+                    class="rounded text-teal-600" />
+                  Tìm trên tất cả khối lớp
+                </label>
+                <button onclick="goHome()" class="text-xs font-semibold text-teal-700 hover:underline">← Trang chủ</button>
+              </div>
             </div>
 
             <div class="grid sm:grid-cols-3 gap-3">
@@ -773,6 +1081,9 @@
       `;
     }
 
+    // =========================================================================
+    // MỤC 2 & 3: ÔN TẬP & KIỂM TRA
+    // =========================================================================
     function setMcqAnswer(qid, opt) {
       state.answers[qid] = opt;
       renderAll();
@@ -808,24 +1119,25 @@
       const isExam = state.mode === "exam";
 
       return `
-        <div class="space-y-5">
+        <div class="max-w-5xl mx-auto space-y-5">
           <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap justify-between items-center gap-3">
             <div>
               <h2 class="font-bold text-lg text-slate-800">
-                ${isExam ? "Bài kiểm tra tổng hợp (Đủ 5 dạng bài tập)" : "Chế độ Luyện tập (Kiểm tra đáp án từng câu)"}
+                ${isExam ? "⏱️ Bài kiểm tra tổng hợp (Đủ 5 dạng bài tập)" : "🎯 Ôn tập chuyên đề (Kiểm tra đáp án từng câu)"}
               </h2>
               <p class="text-sm text-slate-500">Hỗ trợ trắc nghiệm 4 lựa chọn, Đúng/Sai 4 ý, Điền khuyết, Trả lời ngắn và Tự luận.</p>
             </div>
-            ${isExam ? `
-              <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3">
+              ${isExam ? `
                 <span id="exam-timer" class="bg-rose-100 text-rose-700 font-bold px-3 py-1.5 rounded-lg">⏳ ${formatTime(state.timeLeft)}</span>
                 ${!state.examSubmitted ? `
                   <button onclick="state.examSubmitted = true; renderAll();" class="bg-teal-700 text-white font-bold px-4 py-2 rounded-lg hover:bg-teal-800">
                     Nộp bài
                   </button>
                 ` : ""}
-              </div>
-            ` : ""}
+              ` : ""}
+              <button onclick="goHome()" class="text-xs font-semibold text-teal-700 hover:underline">← Trang chủ</button>
+            </div>
           </div>
 
           ${(isExam && state.examSubmitted) ? `
@@ -918,6 +1230,9 @@
       `;
     }
 
+    // =========================================================================
+    // MỤC QUẢN TRỊ ĐỘC QUYỀN CỦA GIÁO VIÊN
+    // =========================================================================
     function autoExtractCode(textarea) {
       const val = textarea.value;
       const match = val.trim().match(/^\[([A-Za-z0-9-_]+)\]\s*(.*)$/s);
@@ -928,7 +1243,6 @@
       }
     }
 
-    // Chèn nhanh ký hiệu LaTeX / Hóa học vào ô lời giải
     function insertSnippet(targetId, snippet) {
       const el = document.getElementById(targetId);
       if (!el) return;
@@ -1047,19 +1361,23 @@
 
     function renderAdminView() {
       return `
-        <div class="space-y-6">
+        <div class="max-w-5xl mx-auto space-y-6">
           <div class="flex flex-wrap gap-2 bg-amber-50 p-3 rounded-xl border border-amber-200">
             <button onclick="state.adminSubTab = 'single'; renderAll();"
               class="px-4 py-2 rounded-lg text-sm font-bold ${state.adminSubTab === "single" ? "bg-teal-700 text-white" : "bg-white text-slate-700 border"}">
-              ✍️ Nhập từng câu (Kèm Mã & LaTeX/MathType)
+              ✍️ Nhập từng câu (Kèm Mã & LaTeX)
             </button>
             <button onclick="state.adminSubTab = 'bulk'; renderAll();"
               class="px-4 py-2 rounded-lg text-sm font-bold ${state.adminSubTab === "bulk" ? "bg-teal-700 text-white" : "bg-white text-slate-700 border"}">
-              ⚡ Nhập hàng loạt nhiều câu có sẵn Mã
+              ⚡ Nhập hàng loạt câu hỏi
+            </button>
+            <button onclick="state.adminSubTab = 'docs'; renderAll();"
+              class="px-4 py-2 rounded-lg text-sm font-bold ${state.adminSubTab === "docs" ? "bg-teal-700 text-white" : "bg-white text-slate-700 border"}">
+              📚 Đăng Tài liệu / Chuyên đề
             </button>
             <button onclick="state.adminSubTab = 'grades'; renderAll();"
               class="px-4 py-2 rounded-lg text-sm font-bold ${state.adminSubTab === "grades" ? "bg-amber-600 text-white" : "bg-white text-slate-700 border"}">
-              📚 Mở rộng Khối lớp
+              🎓 Mở rộng Khối lớp
             </button>
           </div>
 
@@ -1068,8 +1386,7 @@
               <div class="border-b pb-3 space-y-1">
                 <h2 class="font-bold text-lg text-teal-800">Thêm câu hỏi mới & Gắn Mã tra cứu</h2>
                 <p class="text-xs text-slate-600">
-                  • <strong>Xuống dòng:</strong> Nhấn <kbd class="px-1.5 py-0.5 bg-slate-100 border rounded">Enter</kbd> để tách từng bước giải.<br/>
-                  • <strong>Công thức Toán/Hóa & MathType:</strong> Đặt trong cặp dấu <code class="bg-slate-100 px-1 rounded">$ ... $</code> (cùng dòng) hoặc <code class="bg-slate-100 px-1 rounded">$$ ... $$</code> (căn giữa). Trong MathType chọn <em>Preferences → Cut and Copy Preferences → LaTeX 2.09 and later</em> để copy dán thẳng vào đây.
+                  Nhấn <kbd class="px-1.5 py-0.5 bg-slate-100 border rounded">Enter</kbd> để xuống dòng từng bước. Công thức Toán/Hóa đặt trong <code class="bg-slate-100 px-1 rounded">$ ... $</code> hoặc <code class="bg-slate-100 px-1 rounded">$$ ... $$</code>.
                 </p>
               </div>
               <form onsubmit="submitSingleQuestion(event)" class="space-y-4">
@@ -1103,7 +1420,7 @@
                 <div>
                   <label class="block text-xs font-semibold mb-1">Nội dung câu hỏi</label>
                   <textarea id="q-content" required rows="2" oninput="autoExtractCode(this)"
-                    placeholder="Nhập hoặc dán đề bài (VD: Hòa tan $5,6\\text{ g}$ $Fe$ vào dung dịch $H_2SO_4$...)"
+                    placeholder="Nhập hoặc dán đề bài (có thể dán kèm [MÃ] ở đầu)..."
                     class="w-full border rounded-lg p-2.5 text-sm"></textarea>
                 </div>
 
@@ -1158,7 +1475,7 @@
               <div>
                 <h2 class="font-bold text-lg text-teal-800">Nhập nhanh hàng loạt câu hỏi có sẵn Mã</h2>
                 <p class="text-xs text-slate-600 mt-1">
-                  Mỗi dòng 1 câu theo cấu trúc: <code class="bg-slate-100 px-1 rounded font-bold">MÃ | ĐỀ BÀI | ĐÁP ÁN | GỢI Ý | LỜI GIẢI</code> (Dùng <code class="bg-slate-100 px-1 rounded">\\n</code> trong phần lời giải nếu muốn ngắt xuống dòng).
+                  Mỗi dòng 1 câu: <code class="bg-slate-100 px-1 rounded font-bold">MÃ | ĐỀ BÀI | ĐÁP ÁN | GỢI Ý | LỜI GIẢI</code> (Dùng <code class="bg-slate-100 px-1 rounded">\\n</code> để xuống dòng).
                 </p>
               </div>
               <form onsubmit="submitBulkImport(event)" class="space-y-3">
@@ -1175,10 +1492,46 @@
                   </div>
                 </div>
                 <textarea id="bulk-text" required rows="6"
-                  placeholder="9KL-10 | Hòa tan 2,4g Mg vào HCl dư thu được bao nhiêu lít $H_2$ (đkc)? | 2,479 lít | Tính $n_{Mg} = \\frac{2,4}{24} = 0,1\\text{ mol}$ | Bước 1: $n_{Mg} = 0,1\\text{ mol}$\\nBước 2: $V_{H_2} = 0,1 \\times 24,79 = 2,479\\text{ lít}$"
+                  placeholder="9KL-10 | Hòa tan 2,4g Mg vào HCl dư thu được bao nhiêu lít $H_2$ (đkc)? | 2,479 lít | Tính $n_{Mg} = 0,1\\text{ mol}$ | Bước 1: $n_{Mg} = 0,1\\text{ mol}$\\nBước 2: $V_{H_2} = 0,1 \\times 24,79 = 2,479\\text{ lít}$"
                   class="w-full border rounded-lg p-3 text-sm font-mono"></textarea>
                 <button type="submit" class="bg-teal-700 text-white font-bold px-5 py-2.5 rounded-lg hover:bg-teal-800">
                   ⚡ Nạp toàn bộ danh sách lên hệ thống
+                </button>
+              </form>
+            </div>
+          ` : ""}
+
+          ${state.adminSubTab === "docs" ? `
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
+              <h2 class="font-bold text-lg text-teal-800">Đăng Tài liệu / Chuyên đề mới lên Kho Tài liệu</h2>
+              <form onsubmit="addNewDoc(event)" class="space-y-3">
+                <div class="grid sm:grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-semibold mb-1">Áp dụng cho Khối lớp</label>
+                    <select id="doc-grade" class="w-full border rounded-lg p-2 text-sm">
+                      ${state.grades.map((g) => `<option value="${esc(g.id)}">${esc(g.name)}</option>`).join("")}
+                      <option value="ALL">Dùng chung tất cả các khối</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold mb-1">Phân loại tài liệu</label>
+                    <input id="doc-cat" required placeholder="VD: Tóm tắt lý thuyết, Đề cương ôn tập, Sơ đồ tư duy..." class="w-full border rounded-lg p-2 text-sm" />
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold mb-1">Tiêu đề tài liệu</label>
+                  <input id="doc-title" required placeholder="VD: Chuyên đề Kim loại & Dãy hoạt động hóa học (KHTN 9)" class="w-full border rounded-lg p-2 text-sm" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold mb-1">Nội dung tóm tắt / Kiến thức trọng tâm (Hỗ trợ LaTeX)</label>
+                  <textarea id="doc-summary" required rows="3" placeholder="Tóm tắt nội dung chính hoặc công thức quan trọng..." class="w-full border rounded-lg p-2.5 text-sm"></textarea>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold mb-1">Đường link tải tệp (Google Drive / PDF - Tùy chọn)</label>
+                  <input id="doc-link" placeholder="https://drive.google.com/..." class="w-full border rounded-lg p-2 text-sm" />
+                </div>
+                <button type="submit" class="bg-teal-700 text-white font-bold px-5 py-2.5 rounded-lg hover:bg-teal-800">
+                  + Đăng lên Kho Tài liệu
                 </button>
               </form>
             </div>
